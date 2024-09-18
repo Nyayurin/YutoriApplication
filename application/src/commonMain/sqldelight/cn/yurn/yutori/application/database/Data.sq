@@ -1,0 +1,9 @@
+CREATE TABLE Data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    self_id TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    conversations TEXT DEFAULT '[]',
+    guilds TEXT DEFAULT '[]',
+    friends TEXT DEFAULT '[]',
+    events TEXT DEFAULT '[]'
+);

@@ -1,0 +1,17 @@
+CREATE TABLE Event (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    type TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    self_id TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
+    argv_id INTEGER,
+    button_id TEXT,
+    channel_id TEXT,
+    guild_id TEXT,
+    login_id INTEGER,
+    member_id INTEGER,
+    message_id TEXT,
+    operator_id TEXT,
+    role_id TEXT,
+    user_id TEXT
+);

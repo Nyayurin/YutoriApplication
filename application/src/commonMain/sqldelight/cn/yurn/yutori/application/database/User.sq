@@ -1,0 +1,9 @@
+import kotlin.Boolean;
+
+CREATE TABLE User (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT,
+    nick TEXT,
+    avatar TEXT,
+    is_bot INTEGER AS Boolean
+);

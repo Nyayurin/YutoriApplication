@@ -1,0 +1,4 @@
+CREATE TABLE GuildRole (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT
+);

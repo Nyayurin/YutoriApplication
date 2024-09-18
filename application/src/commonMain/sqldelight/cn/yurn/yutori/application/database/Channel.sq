@@ -1,0 +1,6 @@
+CREATE TABLE Channel (
+    id TEXT PRIMARY KEY NOT NULL,
+    type INTEGER NOT NULL,
+    name TEXT,
+    parent_id TEXT
+);
