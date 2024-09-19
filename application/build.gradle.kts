@@ -108,14 +108,11 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
-            windows {
-                targetFormats(TargetFormat.Msi, TargetFormat.Exe, TargetFormat.AppImage)
-            }
-            linux {
-                targetFormats(TargetFormat.Deb, TargetFormat.Rpm, TargetFormat.AppImage)
-            }
-            macOS {
-                targetFormats(TargetFormat.Dmg, TargetFormat.Pkg)
+            when (val os = System.getProperty("os.name")) {
+                "Windows", "Windows 11" -> targetFormats(TargetFormat.Msi, TargetFormat.Exe, TargetFormat.AppImage)
+                "Linux" -> targetFormats(TargetFormat.Deb, TargetFormat.Rpm, TargetFormat.AppImage)
+                "Mac OS", "Mac OS X" -> targetFormats(TargetFormat.Dmg, TargetFormat.Pkg,)
+                else -> error("Unsupported OS: $os")
             }
             packageName = "Yutori Application"
             packageVersion = System.getenv("VERSION")
