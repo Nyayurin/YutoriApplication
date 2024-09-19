@@ -83,7 +83,7 @@ fun ConversationCard(
         }
     ) {
         Card(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
             onClick = { onClick(conversation) },
             modifier = Modifier
@@ -181,7 +181,7 @@ fun GuildCard(
     onClick: (Guild) -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
         onClick = { onClick(guild) },
         modifier = Modifier
@@ -245,7 +245,7 @@ fun FriendCard(
     onClick: (User) -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
         onClick = { onClick(user) },
         modifier = Modifier

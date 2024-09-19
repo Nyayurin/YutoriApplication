@@ -147,9 +147,9 @@ fun LeftBubble(event: Event<MessageEvent>) {
                 onClick = { },
                 shape = RoundedCornerShape(
                     topStart = 0.dp,
-                    topEnd = 12.dp,
-                    bottomStart = 12.dp,
-                    bottomEnd = 12.dp
+                    topEnd = 16.dp,
+                    bottomStart = 16.dp,
+                    bottomEnd = 16.dp
                 ),
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh)
             ) {
@@ -198,10 +198,10 @@ fun RightBubble(event: Event<MessageEvent>) {
             Card(
                 onClick = { },
                 shape = RoundedCornerShape(
-                    topStart = 12.dp,
+                    topStart = 16.dp,
                     topEnd = 0.dp,
-                    bottomStart = 12.dp,
-                    bottomEnd = 12.dp
+                    bottomStart = 16.dp,
+                    bottomEnd = 16.dp
                 ),
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary)
             ) {
