@@ -13,10 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,8 +50,8 @@ fun ConversationList(
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(12.dp),
         modifier = modifier
     ) {
         items(conversationList) { conversation ->
@@ -81,9 +82,9 @@ fun ConversationCard(
             }
         }
     ) {
-        ElevatedCard(
-            elevation = CardDefaults.elevatedCardElevation(3.dp, 3.dp, 3.dp, 3.dp, 3.dp, 3.dp),
-            colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.surfaceContainerLow),
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
             onClick = { onClick(conversation) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -161,8 +162,8 @@ fun GuildList(
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(12.dp),
         modifier = modifier
     ) {
         items(guildList) { guild ->
@@ -179,9 +180,9 @@ fun GuildCard(
     guild: Guild,
     onClick: (Guild) -> Unit
 ) {
-    ElevatedCard(
-        elevation = CardDefaults.elevatedCardElevation(3.dp, 3.dp, 3.dp, 3.dp, 3.dp, 3.dp),
-        colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.surfaceContainerLow),
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
         onClick = { onClick(guild) },
         modifier = Modifier
             .fillMaxWidth()
@@ -225,8 +226,8 @@ fun FriendList(
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(12.dp),
         modifier = modifier
     ) {
         items(friendList) { user ->
@@ -243,9 +244,9 @@ fun FriendCard(
     user: User,
     onClick: (User) -> Unit
 ) {
-    ElevatedCard(
-        elevation = CardDefaults.elevatedCardElevation(3.dp, 3.dp, 3.dp, 3.dp, 3.dp, 3.dp),
-        colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.surfaceContainerLow),
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
         onClick = { onClick(user) },
         modifier = Modifier
             .fillMaxWidth()

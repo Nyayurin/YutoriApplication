@@ -15,11 +15,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -143,7 +143,7 @@ fun LeftBubble(event: Event<MessageEvent>) {
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            OutlinedCard(
+            Card(
                 onClick = { },
                 shape = RoundedCornerShape(
                     topStart = 0.dp,
@@ -151,7 +151,7 @@ fun LeftBubble(event: Event<MessageEvent>) {
                     bottomStart = 12.dp,
                     bottomEnd = 12.dp
                 ),
-                colors = CardDefaults.outlinedCardColors(MaterialTheme.colorScheme.background)
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh)
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
@@ -195,7 +195,7 @@ fun RightBubble(event: Event<MessageEvent>) {
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            OutlinedCard(
+            Card(
                 onClick = { },
                 shape = RoundedCornerShape(
                     topStart = 12.dp,
@@ -203,7 +203,7 @@ fun RightBubble(event: Event<MessageEvent>) {
                     bottomStart = 12.dp,
                     bottomEnd = 12.dp
                 ),
-                colors = CardDefaults.outlinedCardColors(MaterialTheme.colorScheme.background)
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary)
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
