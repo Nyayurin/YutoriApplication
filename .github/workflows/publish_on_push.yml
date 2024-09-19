@@ -15,18 +15,21 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
+      - id: version
+        run: echo "::set-output name=version::$(date +'%Y.%m.%d')"
       - run: chmod +x ./gradlew
       - name: Package androidRelease
         uses: ilharp/sign-android-release@v1
         id: sign_app
         with:
+          releaseDir: application/build/compose/release
           signingKey: ${{ secrets.SIGNING_STORE_BASE64 }}
           keyPassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
           keyAlias: ${{ secrets.SIGNING_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: androidRelease
@@ -43,12 +46,14 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
+      - id: version
+        run: echo "::set-output name=version::$(date +'%Y.%m.%d')"
       - run: chmod +x ./gradlew
       - name: package windowsAppImage
         run: ./gradlew :application:packageReleaseAppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: windowsAppImage
@@ -57,7 +62,7 @@ jobs:
         run: ./gradlew :application:packageReleaseMsi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: windowsMsi
@@ -66,7 +71,7 @@ jobs:
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: windowsUberJar
@@ -83,12 +88,14 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
+      - id: version
+        run: echo "::set-output name=version::$(date +'%Y.%m.%d')"
       - run: chmod +x ./gradlew
       - name: package linuxAppImage
         run: ./gradlew :application:packageReleaseAppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: linuxAppImage
@@ -97,7 +104,7 @@ jobs:
         run: ./gradlew :application:packageReleaseDeb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: linuxDeb
@@ -106,7 +113,7 @@ jobs:
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: linuxUberJar
@@ -123,12 +130,14 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
+      - id: version
+        run: echo "::set-output name=version::$(date +'%Y.%m.%d')"
       - run: chmod +x ./gradlew
       - name: package macosAppImage
         run: ./gradlew :application:packageReleaseAppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: macosAppImage
@@ -137,7 +146,7 @@ jobs:
         run: ./gradlew :application:packageReleaseDmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: macosDmg
@@ -146,7 +155,7 @@ jobs:
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.sha }}
+          VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: macosUberJar
