@@ -17,10 +17,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x ./gradlew
       - name: Decode Keystore
-        env:
-          SIGNING: ${{ secrets.SIGNING_KEY_STORE_BASE64 }}
         run: |
-          echo $SIGNING > keystore.txt
+          echo "${{ secrets.SIGNING_STORE_BASE64 }}" > keystore.txt
           openssl enc -d -base64 -in keystore.txt -out application/YutoriApplication.jks
       - name: Package androidRelease
         run: ./gradlew :application:assembleRelease
