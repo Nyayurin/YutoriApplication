@@ -16,7 +16,7 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - id: version
-        run: echo "::set-output name=version::$(date +'%y.%m.%d')"
+        run: echo "version=$(date +'%y.%m.%d')" >> $GITHUB_OUTPUT
       - run: chmod +x ./gradlew
       - name: Decode Keystore
         run: |
@@ -47,7 +47,7 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - id: version
-        run: echo "::set-output name=version::$(date +'%y.%m.%d')"
+        run: echo "version=$(date +'%y.%m.%d')" >> $GITHUB_OUTPUT
       - run: chmod +x ./gradlew
       - name: package windowsUberJar
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
@@ -98,7 +98,7 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - id: version
-        run: echo "::set-output name=version::$(date +'%y.%m.%d')"
+        run: echo "version=$(date +'%y.%m.%d')" >> $GITHUB_OUTPUT
       - run: chmod +x ./gradlew
       - name: package linuxUberJar
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
@@ -149,7 +149,7 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - id: version
-        run: echo "::set-output name=version::$(date +'%y.%m.%d')"
+        run: echo "version=$(date +'%y.%m.%d')" >> $GITHUB_OUTPUT
       - run: chmod +x ./gradlew
       - name: package macosUberJar
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
