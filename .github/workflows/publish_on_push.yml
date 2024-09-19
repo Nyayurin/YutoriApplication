@@ -61,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windowsAppImage
-          path: application/build/compose/binaries/main-release/app/Yutori\ Application
+          path: application/build/compose/binaries/main-release/app/*
       - name: package windowsMsi
         run: ./gradlew :application:packageReleaseMsi
         env:
@@ -108,7 +108,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: linuxAppImage
-          path: application/build/compose/binaries/main-release/app/Yutori\ Application
+          path: application/build/compose/binaries/main-release/app/*
       - name: package linuxDeb
         run: ./gradlew :application:packageReleaseDeb
         env:
