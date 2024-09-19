@@ -8,7 +8,8 @@ activity = "1.9.2"
 coil = "3.0.0-alpha10"
 lifecycle = "2.8.0"
 navigation = "2.8.0-alpha09"
-yutori = "unspecified"
+yutori = "28c5725e0109690fe0ede780641f8832ed31e453"
+yutorix-satori = "a838ac8fa2c2c9cf3fdb7efd7a5f602179071618"
 multiplatform-settings = "1.2.0"
 sqldelight = "2.0.2"
 
@@ -23,8 +24,8 @@ coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil" }
 lifecycle-viewModel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
 yutori = { module = "cn.yurn.yutori:yutori", version.ref = "yutori" }
-yutorix-satori-core = { module = "cn.yurn.yutorix:yutorix-satori-core", version.ref = "yutori" }
-yutorix-satori-adapter = { module = "cn.yurn.yutorix:yutorix-satori-adapter", version.ref = "yutori" }
+yutorix-satori-core = { module = "cn.yurn.yutorix:yutorix-satori-core", version.ref = "yutorix-satori" }
+yutorix-satori-adapter = { module = "cn.yurn.yutorix:yutorix-satori-adapter", version.ref = "yutorix-satori" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 multiplatform-settings-serialization = { module = "com.russhwolf:multiplatform-settings-serialization", version.ref = "multiplatform-settings" }
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }

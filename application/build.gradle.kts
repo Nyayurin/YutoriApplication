@@ -90,7 +90,7 @@ android {
 
         applicationId = "cn.yurn.yutori.application"
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = System.getenv("VERSION")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -110,7 +110,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage)
             packageName = "Yutori Application"
-            packageVersion = "1.0.0"
+            packageVersion = System.getenv("VERSION")
             jvmArgs("-Dfile.encoding=UTF-8")
         }
 

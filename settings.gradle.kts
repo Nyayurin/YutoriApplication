@@ -11,12 +11,20 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
-        mavenLocal()
+        val actor = providers.gradleProperty("gpr.actor").orNull ?: System.getenv("GITHUB_ACTOR")
+        val token = providers.gradleProperty("gpr.token").orNull ?: System.getenv("GITHUB_TOKEN")
         maven {
-            url = uri("https://maven.pkg.github.com/Nyayurn/Yutori")
+            url = uri("https://maven.pkg.github.com/Nyayurn/yutori")
             credentials {
-                username = "Nyayurn"
-                password = System.getenv("GITHUB_PERSONAL_TOKEN")
+                username = actor
+                password = token
+            }
+        }
+        maven {
+            url = uri("https://maven.pkg.github.com/Nyayurn/yutorix-satori")
+            credentials {
+                username = actor
+                password = token
             }
         }
         google()
