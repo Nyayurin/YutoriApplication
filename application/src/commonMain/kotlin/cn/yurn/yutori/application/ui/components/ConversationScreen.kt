@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -119,7 +118,7 @@ fun BottomInput(onMessageSend: (String) -> Unit) {
 }
 
 @Composable
-fun LeftGuildBubble(event: Event<MessageEvent>) {
+fun LeftBubble(event: Event<MessageEvent>) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
@@ -179,7 +178,7 @@ fun LeftGuildBubble(event: Event<MessageEvent>) {
 }
 
 @Composable
-fun RightGuildBubble(event: Event<MessageEvent>) {
+fun RightBubble(event: Event<MessageEvent>) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),
         modifier = Modifier
@@ -210,108 +209,6 @@ fun RightGuildBubble(event: Event<MessageEvent>) {
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
                     modifier = Modifier
                         .padding(16.dp)
-                ) {
-                    for (column in makeMessage(event)) {
-                        if (column.size <= 1) {
-                            if (column.isEmpty()) {
-                                BrMessageElementViewer.Content(Br())
-                            } else {
-                                SelectElement(column[0])
-                            }
-                        } else {
-                            Row {
-                                for (element in column) SelectElement(element)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        AsyncImage(
-            model = event.user.avatar,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-        )
-    }
-}
-
-@Composable
-fun LeftUserBubble(event: Event<MessageEvent>) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = 64.dp)
-    ) {
-        AsyncImage(
-            model = event.user.avatar,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-        )
-        Column(
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.weight(1F)
-        ) {
-            OutlinedCard(
-                onClick = { },
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.outlinedCardColors(MaterialTheme.colorScheme.background)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .requiredHeight(48.dp)
-                ) {
-                    for (column in makeMessage(event)) {
-                        if (column.size <= 1) {
-                            if (column.isEmpty()) {
-                                BrMessageElementViewer.Content(Br())
-                            } else {
-                                SelectElement(column[0])
-                            }
-                        } else {
-                            Row {
-                                for (element in column) SelectElement(element)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RightUserBubble(event: Event<MessageEvent>) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 64.dp)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.weight(1F)
-        ) {
-            OutlinedCard(
-                onClick = { },
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.outlinedCardColors(MaterialTheme.colorScheme.background)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .requiredHeight(48.dp)
                 ) {
                     for (column in makeMessage(event)) {
                         if (column.size <= 1) {

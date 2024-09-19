@@ -185,7 +185,7 @@ fun GuildCard(
         onClick = { onClick(guild) },
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(64.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -203,12 +203,12 @@ fun GuildCard(
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(32.dp)
                         .clip(CircleShape)
                 )
                 Text(
                     text = guild.name ?: guild.id,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -249,7 +249,7 @@ fun FriendCard(
         onClick = { onClick(user) },
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(64.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -267,12 +267,12 @@ fun FriendCard(
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(32.dp)
                         .clip(CircleShape)
                 )
                 Text(
                     text = user.nick ?: user.name ?: user.id,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

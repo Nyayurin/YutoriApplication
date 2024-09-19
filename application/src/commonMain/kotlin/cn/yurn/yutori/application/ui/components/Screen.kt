@@ -472,9 +472,9 @@ fun ConversationGuildScreen(navController: NavController, guild: Guild) {
                 key = { message -> message.id }
             ) { event ->
                 if (event.user.id == Data.self()!!.self_id) {
-                    RightGuildBubble(event)
+                    RightBubble(event)
                 } else {
-                    LeftGuildBubble(event)
+                    LeftBubble(event)
                 }
             }
         }
@@ -552,9 +552,9 @@ fun ConversationUserScreen(navController: NavController, user: User) {
                 key = { message -> message.id }
             ) { event ->
                 if (event.user.id == Data.self()!!.self_id) {
-                    RightUserBubble(event)
+                    RightBubble(event)
                 } else {
-                    LeftUserBubble(event)
+                    LeftBubble(event)
                 }
             }
         }
