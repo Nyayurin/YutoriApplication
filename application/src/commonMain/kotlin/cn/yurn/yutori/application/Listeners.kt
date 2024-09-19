@@ -172,9 +172,24 @@ fun Context<SigningEvent>.onAnyEvent() {
             conversations.removeAll {
                 when (type) {
                     "guild" -> it.guild!!.id == event.guild!!.id
-                    "user" -> it.user!!.id == event.user.id
+                    "user" -> it.channel.id == event.channel.id
                     else -> error("Unsupported type: $type")
                 }
+            }
+            val avatar = when (type) {
+                "guild" -> {
+                    val guild = Data.guilds().find { it.id == event.guild?.id }!!
+                    event.guild?.avatar ?: guild.avatar
+                }
+                "user" -> {
+                    val user = Data.userChannels().filterValues {
+                        it.id == event.channel.id
+                    }.firstNotNullOf { (key, _) ->
+                        Data.friends().find { it.id == key }
+                    }
+                    user.avatar
+                }
+                else -> error("Unsupported type: $type")
             }
             val name = when (type) {
                 "guild" -> {
@@ -183,15 +198,19 @@ fun Context<SigningEvent>.onAnyEvent() {
                 }
 
                 "user" -> {
-                    val user = Data.friends().find { it.id == event.user.id }!!
-                    event.user.nick ?: event.user.name ?: user.nick ?: user.name ?: user.id
+                    val user = Data.userChannels().filterValues {
+                        it.id == event.channel.id
+                    }.firstNotNullOf { (key, _) ->
+                        Data.friends().find { it.id == key }
+                    }
+                    user.nick ?: user.name ?: user.id
                 }
 
                 else -> error("Unsupported type: $type")
             }
             val unread = event.user.id != event.self_id && when (type) {
                 "guild" -> event.guild!!.id != Data.conversation!!.guild!!.id
-                "user" -> event.user.id != Data.conversation!!.user!!.id
+                "user" -> event.channel.id != Data.conversation!!.channel.id
                 else -> error("Unsupported type: $type")
             }
             conversations += Conversation(
@@ -199,7 +218,7 @@ fun Context<SigningEvent>.onAnyEvent() {
                 type = type,
                 guild = event.guild,
                 user = if (event.guild == null) event.user else null,
-                avatar = event.guild?.avatar ?: event.user.avatar.toString(),
+                avatar = avatar,
                 name = name,
                 content = content,
                 updatedAt = event.timestamp.toLong(),

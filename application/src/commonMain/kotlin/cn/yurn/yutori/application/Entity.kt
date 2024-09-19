@@ -20,7 +20,7 @@ data class Conversation(
     val guild: Guild? = null,
     @Serializable(UserSerializer::class)
     val user: User? = null,
-    val avatar: String,
+    val avatar: String? = null,
     val name: String,
     val content: String,
     val updatedAt: Long = 0,
