@@ -21,11 +21,12 @@ jobs:
           echo "SIGNING_STORE_PASSWORD=${{ secrets.SIGNING_STORE_PASSWORD }}" >> $GITHUB_ENV
           echo "SIGNING_KEY_ALIAS=${{ secrets.SIGNING_KEY_ALIAS }}" >> $GITHUB_ENV
           echo "SIGNING_KEY_PASSWORD=${{ secrets.SIGNING_KEY_PASSWORD }}" >> $GITHUB_ENV
-          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
           echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
           chmod +x ./gradlew
       - name: Package androidRelease
         run: ./gradlew :application:assembleRelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: androidRelease
@@ -43,29 +44,36 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - run: |
-          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
           echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
           chmod +x ./gradlew
       - name: package windowsUberJar
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: windowsUberJar
           path: application/build/compose/jars/*
       - name: package windowsAppImage
         run: ./gradlew :application:packageReleaseAppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: windowsAppImage
           path: application/build/compose/binaries/main-release/app/Yutori\ Application
       - name: package windowsMsi
         run: ./gradlew :application:packageReleaseMsi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: windowsMsi
           path: application/build/compose/binaries/main-release/msi/*
       - name: package windowsExe
         run: ./gradlew :application:packageReleaseExe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: windowsExe
@@ -83,29 +91,36 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - run: |
-          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
           echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
           chmod +x ./gradlew
       - name: package linuxUberJar
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: linuxUberJar
           path: application/build/compose/jars/*
       - name: package linuxAppImage
         run: ./gradlew :application:packageReleaseAppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: linuxAppImage
           path: application/build/compose/binaries/main-release/app/Yutori\ Application
       - name: package linuxDeb
         run: ./gradlew :application:packageReleaseDeb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: linuxDeb
           path: application/build/compose/binaries/main-release/deb/*
       - name: package linuxRpm
         run: ./gradlew :application:packageReleaseRpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: linuxRpm
@@ -123,23 +138,28 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - run: |
-          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
           echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
           chmod +x ./gradlew
       - name: package macosUberJar
         run: ./gradlew :application:packageReleaseUberJarForCurrentOS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: macosUberJar
           path: application/build/compose/jars/*
       - name: package macosDmg
         run: ./gradlew :application:packageReleaseDmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: macosDmg
           path: application/build/compose/binaries/main-release/dmg/*
       - name: package macosPkg
         run: ./gradlew :application:packageReleasePkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: macosPkg
