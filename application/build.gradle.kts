@@ -108,7 +108,15 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage)
+            windows {
+                targetFormats(TargetFormat.Msi, TargetFormat.Exe, TargetFormat.AppImage)
+            }
+            linux {
+                targetFormats(TargetFormat.Deb, TargetFormat.Rpm, TargetFormat.AppImage)
+            }
+            macOS {
+                targetFormats(TargetFormat.Dmg, TargetFormat.Pkg)
+            }
             packageName = "Yutori Application"
             packageVersion = System.getenv("VERSION")
             jvmArgs("-Dfile.encoding=UTF-8")
