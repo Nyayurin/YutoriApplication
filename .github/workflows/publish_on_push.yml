@@ -16,24 +16,26 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - id: version
-        run: echo "::set-output name=version::$(date +'%Y.%m.%d')"
+        run: echo "::set-output name=version::$(date +'%y.%m.%d')"
       - run: chmod +x ./gradlew
-      - name: Package androidRelease
-        uses: ilharp/sign-android-release@v1
-        id: sign_app
-        with:
-          releaseDir: application/build/compose/release
-          signingKey: ${{ secrets.SIGNING_STORE_BASE64 }}
-          keyPassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          keyAlias: ${{ secrets.SIGNING_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+      - name: Decode Keystore
         env:
+          ENCODED_STRING: ${{ secrets.SIGNING_KEY_STORE_BASE64 }}
+        run: |
+          echo $ENCODED_STRING > keystore-b64.txt
+          base64 -d keystore-b64.txt > application/YutoriApplication.jks
+      - name: Package androidRelease
+        run: ./gradlew :application:assembleRelease
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: androidRelease
-          path: ${{ steps.sign_app.outputs.signedFile }}
+          path: application/build/outputs/apk/release/application-release.apk
   package-windows:
     runs-on: windows-latest
     permissions:
@@ -47,7 +49,7 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - id: version
-        run: echo "::set-output name=version::$(date +'%Y.%m.%d')"
+        run: echo "::set-output name=version::$(date +'%y.%m.%d')"
       - run: chmod +x ./gradlew
       - name: package windowsAppImage
         run: ./gradlew :application:packageReleaseAppImage
@@ -89,7 +91,7 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - id: version
-        run: echo "::set-output name=version::$(date +'%Y.%m.%d')"
+        run: echo "::set-output name=version::$(date +'%y.%m.%d')"
       - run: chmod +x ./gradlew
       - name: package linuxAppImage
         run: ./gradlew :application:packageReleaseAppImage
@@ -131,7 +133,7 @@ jobs:
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - id: version
-        run: echo "::set-output name=version::$(date +'%Y.%m.%d')"
+        run: echo "::set-output name=version::$(date +'%y.%m.%d')"
       - run: chmod +x ./gradlew
       - name: package macosAppImage
         run: ./gradlew :application:packageReleaseAppImage
