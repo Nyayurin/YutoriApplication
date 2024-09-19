@@ -22,6 +22,8 @@ jobs:
         run: |
           echo "${{ secrets.SIGNING_KEY_STORE_BASE64 }}" > keystore.txt
           openssl enc -d -base64 -in keystore.txt -out application/YutoriApplication.jks
+          ls
+          ls application
       - name: Package androidRelease
         run: ./gradlew :application:assembleRelease
         env:
@@ -49,6 +51,15 @@ jobs:
       - id: version
         run: echo "::set-output name=version::$(date +'%y.%m.%d')"
       - run: chmod +x ./gradlew
+      - name: package windowsUberJar
+        run: ./gradlew :application:packageReleaseUberJarForCurrentOS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windowsUberJar
+          path: application/build/compose/jars/*
       - name: package windowsAppImage
         run: ./gradlew :application:packageReleaseAppImage
         env:
@@ -76,15 +87,6 @@ jobs:
         with:
           name: windowsExe
           path: application/build/compose/binaries/main-release/exe/*
-      - name: package windowsUberJar
-        run: ./gradlew :application:packageReleaseUberJarForCurrentOS
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.version.outputs.version }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: windowsUberJar
-          path: application/build/compose/jars/*
   package-linux:
     runs-on: ubuntu-latest
     permissions:
@@ -100,6 +102,15 @@ jobs:
       - id: version
         run: echo "::set-output name=version::$(date +'%y.%m.%d')"
       - run: chmod +x ./gradlew
+      - name: package linuxUberJar
+        run: ./gradlew :application:packageReleaseUberJarForCurrentOS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linuxUberJar
+          path: application/build/compose/jars/*
       - name: package linuxAppImage
         run: ./gradlew :application:packageReleaseAppImage
         env:
@@ -127,15 +138,6 @@ jobs:
         with:
           name: linuxRpm
           path: application/build/compose/binaries/main-release/rpm/*
-      - name: package linuxUberJar
-        run: ./gradlew :application:packageReleaseUberJarForCurrentOS
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.version.outputs.version }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: linuxUberJar
-          path: application/build/compose/jars/*
   package-macos:
     runs-on: macos-latest
     permissions:
@@ -151,6 +153,15 @@ jobs:
       - id: version
         run: echo "::set-output name=version::$(date +'%y.%m.%d')"
       - run: chmod +x ./gradlew
+      - name: package macosUberJar
+        run: ./gradlew :application:packageReleaseUberJarForCurrentOS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macosUberJar
+          path: application/build/compose/jars/*
       - name: package macosDmg
         run: ./gradlew :application:packageReleaseDmg
         env:
@@ -169,12 +180,3 @@ jobs:
         with:
           name: macosPkg
           path: application/build/compose/binaries/main-release/pkg/*
-      - name: package macosUberJar
-        run: ./gradlew :application:packageReleaseUberJarForCurrentOS
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.version.outputs.version }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: macosUberJar
-          path: application/build/compose/jars/*
