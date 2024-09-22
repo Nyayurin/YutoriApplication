@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LocalContentColor
@@ -158,16 +159,18 @@ fun LeftBubble(event: Event<MessageEvent>) {
                     modifier = Modifier
                         .padding(16.dp)
                 ) {
-                    for (column in makeMessage(event)) {
-                        if (column.size <= 1) {
-                            if (column.isEmpty()) {
-                                BrMessageElementViewer.Content(Br())
+                    SelectionContainer {
+                        for (column in makeMessage(event)) {
+                            if (column.size <= 1) {
+                                if (column.isEmpty()) {
+                                    BrMessageElementViewer.Content(Br())
+                                } else {
+                                    SelectElement(column[0])
+                                }
                             } else {
-                                SelectElement(column[0])
-                            }
-                        } else {
-                            Row {
-                                for (element in column) SelectElement(element)
+                                Row {
+                                    for (element in column) SelectElement(element)
+                                }
                             }
                         }
                     }
@@ -210,16 +213,18 @@ fun RightBubble(event: Event<MessageEvent>) {
                     modifier = Modifier
                         .padding(16.dp)
                 ) {
-                    for (column in makeMessage(event)) {
-                        if (column.size <= 1) {
-                            if (column.isEmpty()) {
-                                BrMessageElementViewer.Content(Br())
+                    SelectionContainer {
+                        for (column in makeMessage(event)) {
+                            if (column.size <= 1) {
+                                if (column.isEmpty()) {
+                                    BrMessageElementViewer.Content(Br())
+                                } else {
+                                    SelectElement(column[0])
+                                }
                             } else {
-                                SelectElement(column[0])
-                            }
-                        } else {
-                            Row {
-                                for (element in column) SelectElement(element)
+                                Row {
+                                    for (element in column) SelectElement(element)
+                                }
                             }
                         }
                     }
