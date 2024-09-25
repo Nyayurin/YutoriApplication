@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -30,11 +32,14 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
@@ -43,6 +48,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -64,11 +70,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import cn.yurn.yutori.Event
 import cn.yurn.yutori.Guild
+import cn.yurn.yutori.Login
 import cn.yurn.yutori.MessageEvent
 import cn.yurn.yutori.MessageEvents
 import cn.yurn.yutori.User
 import cn.yurn.yutori.application.ConnectSetting
 import cn.yurn.yutori.application.Data
+import cn.yurn.yutori.application.Identify
 import cn.yurn.yutori.application.Setting
 import cn.yurn.yutori.application.actions
 import cn.yurn.yutori.application.conversations
@@ -88,185 +96,291 @@ import yutoriapplication.application.generated.resources.Res
 import yutoriapplication.application.generated.resources.chat_bubble_24px
 import yutoriapplication.application.generated.resources.groups_24px
 import yutoriapplication.application.generated.resources.person_24px
+import yutoriapplication.application.generated.resources.settings_24px
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    var page by remember { mutableStateOf(0) }
-    Scaffold(
-        topBar = {
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceContainer
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+    val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(modifier = Modifier.width(220.dp)) {
+                Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .statusBarsPadding()
-                        .padding(horizontal = 24.dp)
-                        .fillMaxWidth()
-                        .height(80.dp)
+                        .padding(12.dp)
+                        .fillMaxHeight()
+                ) {
+                    Column {
+                        for (login in Data.logins) {
+                            val self = login.user
+                            val status = when (Data.logins.find {
+                                it.platform == Data.identify?.platform && it.self_id == Data.identify?.selfId
+                            }?.status) {
+                                Login.Status.OFFLINE -> "Offline"
+                                Login.Status.ONLINE -> "Online"
+                                Login.Status.CONNECT -> "Connect"
+                                Login.Status.RECONNECT -> "Reconnect"
+                                Login.Status.DISCONNECT -> "Disconnect"
+                                else -> "Unknown"
+                            }
+                            NavigationDrawerItem(
+                                label = {
+                                    Text(
+                                        text = self?.nick ?: self?.name ?: self?.id.toString(),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                },
+                                icon = {
+                                    AsyncImage(
+                                        model = self?.avatar,
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clip(CircleShape)
+                                    )
+                                },
+                                badge = {
+                                    Text(
+                                        text = status,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                },
+                                selected = Data.identify?.platform == login.platform && Data.identify?.selfId == login.self_id,
+                                onClick = {
+                                    Data.identify = Identify(login.platform!!, login.self_id!!)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = "Setting",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        icon = {
+                            Icon(
+                                painter = painterResource(Res.drawable.settings_24px),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        selected = false,
+                        onClick = { navController.navigate("setting") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+    ) {
+        var page by remember { mutableStateOf(0) }
+        Scaffold(
+            topBar = {
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainer
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .statusBarsPadding()
+                            .padding(horizontal = 24.dp)
+                            .fillMaxWidth()
+                            .height(80.dp)
                     ) {
-                        val self = Data.self()?.user
-                        AsyncImage(
-                            model = self?.avatar,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .clickable { navController.navigate("setting") }
-                        )
-                        Text(
-                            text = self?.nick ?: self?.name ?: self?.id.toString(),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.titleLarge,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(32.dp)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            val self = Data.self()?.user
+                            AsyncImage(
+                                model = self?.avatar,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        scope.launch {
+                                            drawerState.open()
+                                        }
+                                    }
+                            )
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = self?.nick ?: self?.name ?: self?.id.toString(),
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                val status = when (Data.logins.find {
+                                    it.platform == Data.identify?.platform && it.self_id == Data.identify?.selfId
+                                }?.status) {
+                                    Login.Status.OFFLINE -> "Offline"
+                                    Login.Status.ONLINE -> "Online"
+                                    Login.Status.CONNECT -> "Connect"
+                                    Login.Status.RECONNECT -> "Reconnect"
+                                    Login.Status.DISCONNECT -> "Disconnect"
+                                    else -> "Unknown"
+                                }
+                                Text(
+                                    text = status,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                        IconButton(
+                            onClick = { }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
                     }
                 }
-            }
-        },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = page == 0,
-                    onClick = { page = 0 },
-                    icon = {
-                        Icon(
-                            painter = painterResource(Res.drawable.chat_bubble_24px),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = "Message",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-                NavigationBarItem(
-                    selected = page == 1,
-                    onClick = { page = 1 },
-                    icon = {
-                        Icon(
-                            painter = painterResource(Res.drawable.groups_24px),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = "Guild",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                )
-                NavigationBarItem(
-                    selected = page == 2,
-                    onClick = { page = 2 },
-                    icon = {
-                        Icon(
-                            painter = painterResource(Res.drawable.person_24px),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = "Friend",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-            }
-        }
-    ) { innerPaddings ->
-        Data.identify ?: return@Scaffold
-        val conversations = Data.conversations()
-        val guilds = Data.guilds()
-        val friends = Data.friends()
-        val scope = rememberCoroutineScope()
-        when (page) {
-            0 -> ConversationList(
-                conversationList = conversations,
-                onClick = { conversation ->
-                    conversations[conversations.indexOf(conversation)] =
-                        conversation.copy(unread = false)
-                    Data.conversation = conversation
-                    navController.navigate(
-                        when (conversation.type) {
-                            "guild" -> "conversation/guild/${conversation.guild!!.id}"
-                            "user" -> "conversation/user/${conversation.user!!.id}"
-                            else -> throw UnsupportedOperationException("Unsupported conversation: ${conversation.type}")
+            },
+            bottomBar = {
+                NavigationBar {
+                    NavigationBarItem(
+                        selected = page == 0,
+                        onClick = { page = 0 },
+                        icon = {
+                            Icon(
+                                painter = painterResource(Res.drawable.chat_bubble_24px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = "Message",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    NavigationBarItem(
+                        selected = page == 1,
+                        onClick = { page = 1 },
+                        icon = {
+                            Icon(
+                                painter = painterResource(Res.drawable.groups_24px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = "Guild",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
                     )
-                },
-                modifier = Modifier
-                    .padding(innerPaddings)
-                    .fillMaxSize()
-            )
+                    NavigationBarItem(
+                        selected = page == 2,
+                        onClick = { page = 2 },
+                        icon = {
+                            Icon(
+                                painter = painterResource(Res.drawable.person_24px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = "Friend",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+            }
+        ) { innerPaddings ->
+            Data.identify ?: return@Scaffold
+            val conversations = Data.conversations()
+            val guilds = Data.guilds()
+            val friends = Data.friends()
+            when (page) {
+                0 -> ConversationList(
+                    conversationList = conversations,
+                    onClick = { conversation ->
+                        conversations[conversations.indexOf(conversation)] =
+                            conversation.copy(unread = false)
+                        Data.conversation = conversation
+                        navController.navigate(
+                            when (conversation.type) {
+                                "guild" -> "conversation/guild/${conversation.guild!!.id}"
+                                "user" -> "conversation/user/${conversation.user!!.id}"
+                                else -> throw UnsupportedOperationException("Unsupported conversation: ${conversation.type}")
+                            }
+                        )
+                    },
+                    modifier = Modifier
+                        .padding(innerPaddings)
+                        .fillMaxSize()
+                )
 
-            1 -> GuildList(
-                guildList = guilds,
-                onClick = { guild ->
-                    val find = conversations.find { it.guild?.id == guild.id }
-                    if (find != null) {
-                        conversations[conversations.indexOf(find)] = find.copy(unread = false)
-                        Data.conversation = find
-                    }
-                    navController.navigate("conversation/guild/${guild.id}")
-                },
-                modifier = Modifier
-                    .padding(innerPaddings)
-                    .fillMaxSize()
-            )
-
-            2 -> FriendList(
-                friendList = friends,
-                onClick = { user ->
-                    scope.launch {
-                        val find = conversations.find { it.user?.id == user.id }
+                1 -> GuildList(
+                    guildList = guilds,
+                    onClick = { guild ->
+                        val find = conversations.find { it.guild?.id == guild.id }
                         if (find != null) {
                             conversations[conversations.indexOf(find)] = find.copy(unread = false)
                             Data.conversation = find
                         }
-                        navController.navigate("conversation/user/${user.id}")
-                    }
-                },
-                modifier = Modifier
-                    .padding(innerPaddings)
-                    .fillMaxSize()
-            )
+                        navController.navigate("conversation/guild/${guild.id}")
+                    },
+                    modifier = Modifier
+                        .padding(innerPaddings)
+                        .fillMaxSize()
+                )
+
+                2 -> FriendList(
+                    friendList = friends,
+                    onClick = { user ->
+                        scope.launch {
+                            val find = conversations.find { it.user?.id == user.id }
+                            if (find != null) {
+                                conversations[conversations.indexOf(find)] =
+                                    find.copy(unread = false)
+                                Data.conversation = find
+                            }
+                            navController.navigate("conversation/user/${user.id}")
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(innerPaddings)
+                        .fillMaxSize()
+                )
+            }
         }
     }
 }
@@ -330,6 +444,7 @@ fun SettingScreen(navController: NavController) {
                     path = path,
                     token = token
                 )
+                Data.logins.replaceAll { it.copy(status = Login.Status.CONNECT) }
                 Data.yutori?.stop()
                 Data.yutori = makeYutori()
                 Data.viewModelScope.launch {

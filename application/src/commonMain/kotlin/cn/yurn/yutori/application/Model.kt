@@ -41,6 +41,8 @@ object Data : ViewModel() {
         defaultValue = "[]"
     ).let {
         json.decodeFromString(ListSerializer(LoginSerializer), it)
+    }.map {
+        it.copy(status = Login.Status.OFFLINE)
     }.toMutableStateList()
     val conversations: MutableMap<Identify, MutableList<Conversation>> = settings.decodeValue(
         key = "conversations",

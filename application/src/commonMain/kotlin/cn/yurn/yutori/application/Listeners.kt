@@ -51,9 +51,8 @@ suspend fun onConnect(
 ) {
     coroutineScope {
         for (login in logins) {
-            if (Data.logins.find { it.self_id == login.self_id && it.platform == login.platform } == null) {
-                Data.logins += login
-            }
+            Data.logins.removeIf { it.platform == login.platform && it.self_id == login.self_id }
+            Data.logins += login
             val platform = login.platform!!
             val selfId = login.self_id!!
             val identify = Identify(platform, selfId)

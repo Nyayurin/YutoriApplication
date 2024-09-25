@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import cn.yurn.yutori.Login
 import cn.yurn.yutori.application.ui.components.ConversationGuildScreen
 import cn.yurn.yutori.application.ui.components.ConversationUserScreen
 import cn.yurn.yutori.application.ui.components.HomeScreen
@@ -32,6 +33,7 @@ fun App(navController: NavHostController = rememberNavController()) {
     viewModel { Data }
     remember(Unit) {
         if (Setting.connectSetting != null) {
+            Data.logins.replaceAll { it.copy(status = Login.Status.CONNECT) }
             Data.yutori?.stop()
             Data.yutori = makeYutori()
             Data.viewModelScope.launch {
