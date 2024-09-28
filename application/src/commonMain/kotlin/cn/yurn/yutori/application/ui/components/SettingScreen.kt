@@ -35,13 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
-import cn.yurn.yutori.Login
-import cn.yurn.yutori.application.ConnectSetting
-import cn.yurn.yutori.application.Data
 import cn.yurn.yutori.application.Setting
-import cn.yurn.yutori.application.makeYutori
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -162,7 +156,7 @@ fun Connect(onClick: (host: String, port: Int, path: String, token: String) -> U
                 .imePadding()
         ) {
             Text(
-                text = "Connect",
+                text = "Save and connect",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium
             )
