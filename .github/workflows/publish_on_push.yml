@@ -157,7 +157,7 @@ jobs:
           name: macosDmg
           path: application/build/compose/binaries/main-release/dmg/*
       - name: package macosPkg
-        run: ./gradlew :application:packageReleasePkg
+        run: ./gradlew :application:packageReleasePkg --warning-mode all --stacktrace --debug --scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
