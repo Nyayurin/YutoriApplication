@@ -9,19 +9,39 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import cn.yurn.yutori.Login
+import cn.yurn.yutori.application.ConnectSetting
+import cn.yurn.yutori.application.Data
+import cn.yurn.yutori.application.Setting
+import cn.yurn.yutori.application.makeYutori
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -72,6 +92,80 @@ fun SettingItem(title: String, description: String, icon: DrawableResource, onCl
                     modifier = Modifier.size(24.dp)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun Connect(onClick: (host: String, port: Int, path: String, token: String) -> Unit) {
+    var host by remember { mutableStateOf(Setting.connectSetting?.host ?: "") }
+    var port by remember { mutableStateOf(Setting.connectSetting?.port?.toString() ?: "") }
+    var path by remember { mutableStateOf(Setting.connectSetting?.path ?: "") }
+    var token by remember { mutableStateOf(Setting.connectSetting?.token ?: "") }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        OutlinedTextField(
+            value = host,
+            onValueChange = { host = it },
+            shape = RoundedCornerShape(16.dp),
+            singleLine = true,
+            label = { Text(text = "Host") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        )
+        OutlinedTextField(
+            value = port,
+            onValueChange = { port = it },
+            shape = RoundedCornerShape(16.dp),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            label = { Text(text = "Port") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        )
+        OutlinedTextField(
+            value = path,
+            onValueChange = { path = it },
+            shape = RoundedCornerShape(16.dp),
+            singleLine = true,
+            label = { Text(text = "Path") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        )
+        OutlinedTextField(
+            value = token,
+            onValueChange = { token = it },
+            shape = RoundedCornerShape(16.dp),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+            visualTransformation = PasswordVisualTransformation(),
+            label = { Text(text = "Token") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        )
+        Button(
+            onClick = { onClick(host, port.toInt(), path, token) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .imePadding()
+        ) {
+            Text(
+                text = "Connect",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }

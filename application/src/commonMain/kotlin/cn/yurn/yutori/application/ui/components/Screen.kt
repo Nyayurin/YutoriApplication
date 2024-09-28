@@ -94,6 +94,7 @@ import cn.yurn.yutori.user
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.skiko.hostId
 import yutoriapplication.application.generated.resources.Res
 import yutoriapplication.application.generated.resources.chat_bubble_24px
 import yutoriapplication.application.generated.resources.close_24px
@@ -393,11 +394,6 @@ fun HomeScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(navController: NavController) {
-    var host by remember { mutableStateOf(Setting.connectSetting?.host ?: "") }
-    var port by remember { mutableStateOf(Setting.connectSetting?.port?.toString() ?: "") }
-    var path by remember { mutableStateOf(Setting.connectSetting?.path ?: "") }
-    var token by remember { mutableStateOf(Setting.connectSetting?.token ?: "") }
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -472,75 +468,20 @@ fun SettingScreen(navController: NavController) {
                 ModalBottomSheet(
                     onDismissRequest = { showConnect = false }
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        OutlinedTextField(
-                            value = host,
-                            onValueChange = { host = it },
-                            shape = RoundedCornerShape(16.dp),
-                            singleLine = true,
-                            label = { Text(text = "Host") },
-                            modifier = Modifier.fillMaxWidth()
+                    Connect { host, port, path, token ->
+                        Setting.connectSetting = ConnectSetting(
+                            host = host,
+                            port = port,
+                            path = path,
+                            token = token
                         )
-                        OutlinedTextField(
-                            value = port,
-                            onValueChange = { port = it },
-                            shape = RoundedCornerShape(16.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                            label = { Text(text = "Port") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        OutlinedTextField(
-                            value = path,
-                            onValueChange = { path = it },
-                            shape = RoundedCornerShape(16.dp),
-                            singleLine = true,
-                            label = { Text(text = "Path") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        OutlinedTextField(
-                            value = token,
-                            onValueChange = { token = it },
-                            shape = RoundedCornerShape(16.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-                            visualTransformation = PasswordVisualTransformation(),
-                            label = { Text(text = "Token") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Button(
-                            onClick = {
-                                Setting.connectSetting = ConnectSetting(
-                                    host = host,
-                                    port = port.toInt(),
-                                    path = path,
-                                    token = token
-                                )
-                                Data.logins.replaceAll { it.copy(status = Login.Status.CONNECT) }
-                                Data.yutori?.stop()
-                                Data.yutori = makeYutori()
-                                Data.viewModelScope.launch {
-                                    Data.yutori!!.start()
-                                }
-                                showConnect = false
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .imePadding()
-                        ) {
-                            Text(
-                                text = "Connect",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleMedium
-                            )
+                        Data.logins.replaceAll { it.copy(status = Login.Status.CONNECT) }
+                        Data.yutori?.stop()
+                        Data.yutori = makeYutori()
+                        Data.viewModelScope.launch {
+                            Data.yutori!!.start()
                         }
+                        showConnect = false
                     }
                 }
             }
