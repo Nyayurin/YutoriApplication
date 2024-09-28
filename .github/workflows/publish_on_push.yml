@@ -134,7 +134,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'zulu'
       - uses: gradle/actions/setup-gradle@v4
       - run: |
@@ -157,7 +157,7 @@ jobs:
           name: macosDmg
           path: application/build/compose/binaries/main-release/dmg/*
       - name: package macosPkg
-        run: ./gradlew :application:packageReleasePkg --warning-mode all --stacktrace --info --scan
+        run: ./gradlew :application:packageReleasePkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
