@@ -111,9 +111,7 @@ fun Connect(onClick: (host: String, port: Int, path: String, token: String) -> U
             shape = RoundedCornerShape(16.dp),
             singleLine = true,
             label = { Text(text = "Host") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
+            modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = port,
@@ -122,9 +120,7 @@ fun Connect(onClick: (host: String, port: Int, path: String, token: String) -> U
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             label = { Text(text = "Port") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
+            modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = path,
@@ -132,9 +128,7 @@ fun Connect(onClick: (host: String, port: Int, path: String, token: String) -> U
             shape = RoundedCornerShape(16.dp),
             singleLine = true,
             label = { Text(text = "Path") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
+            modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = token,
@@ -144,9 +138,7 @@ fun Connect(onClick: (host: String, port: Int, path: String, token: String) -> U
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
             visualTransformation = PasswordVisualTransformation(),
             label = { Text(text = "Token") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
+            modifier = Modifier.fillMaxWidth()
         )
         Button(
             onClick = { onClick(host, port.toInt(), path, token) },
