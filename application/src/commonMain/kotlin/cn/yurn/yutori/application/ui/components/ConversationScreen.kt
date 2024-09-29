@@ -24,6 +24,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,7 +65,12 @@ import cn.yurn.yutori.message.element.Text
 import cn.yurn.yutori.message.element.Underline
 import cn.yurn.yutori.message.element.Video
 import cn.yurn.yutori.user
+import com.eygraber.compose.placeholder.PlaceholderHighlight
+import com.eygraber.compose.placeholder.material3.placeholder
+import com.eygraber.compose.placeholder.material3.shimmer
 import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.LoadState
 
 @Composable
 fun BottomInput(onMessageSend: (String) -> Unit) {
@@ -126,13 +135,23 @@ fun LeftBubble(event: Event<MessageEvent>) {
             .fillMaxWidth()
             .padding(end = 64.dp)
     ) {
+        val state = rememberAsyncImageState()
+        var visible by remember { mutableStateOf(true) }
+        if (state.loadState is LoadState.Success) {
+            visible = false
+        }
         AsyncImage(
             uri = event.user.avatar,
             contentDescription = null,
+            state = state,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
+                .placeholder(
+                    visible = visible,
+                    highlight = PlaceholderHighlight.shimmer()
+                )
         )
         Column(
             horizontalAlignment = Alignment.Start,
@@ -231,13 +250,23 @@ fun RightBubble(event: Event<MessageEvent>) {
                 }
             }
         }
+        val state = rememberAsyncImageState()
+        var visible by remember { mutableStateOf(true) }
+        if (state.loadState is LoadState.Success) {
+            visible = false
+        }
         AsyncImage(
             uri = event.user.avatar,
             contentDescription = null,
+            state = state,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
+                .placeholder(
+                    visible = visible,
+                    highlight = PlaceholderHighlight.shimmer()
+                )
         )
     }
 }

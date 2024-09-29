@@ -83,8 +83,13 @@ import cn.yurn.yutori.application.self
 import cn.yurn.yutori.application.userChannels
 import cn.yurn.yutori.channel
 import cn.yurn.yutori.user
+import com.eygraber.compose.placeholder.PlaceholderHighlight
+import com.eygraber.compose.placeholder.material3.placeholder
+import com.eygraber.compose.placeholder.material3.shimmer
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
+import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.LoadState
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import yutoriapplication.application.generated.resources.Res
@@ -132,13 +137,23 @@ fun HomeScreen(navController: NavController) {
                                     )
                                 },
                                 icon = {
+                                    val state = rememberAsyncImageState()
+                                    var visible by remember { mutableStateOf(true) }
+                                    if (state.loadState is LoadState.Success) {
+                                        visible = false
+                                    }
                                     AsyncImage(
                                         uri = self?.avatar,
                                         contentDescription = null,
+                                        state = state,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
                                             .size(24.dp)
                                             .clip(CircleShape)
+                                            .placeholder(
+                                                visible = visible,
+                                                highlight = PlaceholderHighlight.shimmer()
+                                            )
                                     )
                                 },
                                 badge = {
@@ -199,9 +214,15 @@ fun HomeScreen(navController: NavController) {
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             val self = Data.self()?.user
+                            val state = rememberAsyncImageState()
+                            var visible by remember { mutableStateOf(true) }
+                            if (state.loadState is LoadState.Success) {
+                                visible = false
+                            }
                             AsyncImage(
                                 uri = self?.avatar,
                                 contentDescription = null,
+                                state = state,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .size(48.dp)
@@ -211,6 +232,10 @@ fun HomeScreen(navController: NavController) {
                                             drawerState.open()
                                         }
                                     }
+                                    .placeholder(
+                                        visible = visible,
+                                        highlight = PlaceholderHighlight.shimmer()
+                                    )
                             )
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(

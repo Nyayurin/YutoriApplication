@@ -18,7 +18,7 @@ kotlin {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             freeCompilerArgs.add("-P")
-            freeCompilerArgs.add("plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=${project.path}/src/androidMain/compose_compiler_config.conf")
+            freeCompilerArgs.add("plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=${project.projectDir.absolutePath}/src/androidMain/compose_compiler_config.conf")
         }
     }
 
@@ -55,6 +55,8 @@ kotlin {
             implementation(libs.sketch.extensions.compose)
             implementation(libs.sketch.svg)
             implementation(libs.sketch.animated)
+            implementation(libs.compose.dnd)
+            implementation(libs.compose.placeholder)
         }
 
         androidMain.dependencies {

@@ -8,6 +8,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -44,6 +48,9 @@ import cn.yurn.yutori.message.element.Sup
 import cn.yurn.yutori.message.element.Text
 import cn.yurn.yutori.message.element.Underline
 import cn.yurn.yutori.message.element.Video
+import com.eygraber.compose.placeholder.PlaceholderHighlight
+import com.eygraber.compose.placeholder.material3.placeholder
+import com.eygraber.compose.placeholder.material3.shimmer
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageRequest
@@ -156,10 +163,12 @@ object ImageMessageElementViewer : MessageElementViewer<Image>() {
 
     @Composable
     override fun Content(element: Image) {
-        var sizeResolver: SizeResolver? = null
         val state = rememberAsyncImageState()
         val loadState = state.loadState
+        var sizeResolver by remember { mutableStateOf<SizeResolver?>(null) }
+        var visible by remember { mutableStateOf(true) }
         if (loadState is LoadState.Success) {
+            visible = false
             val image = loadState.result.image
             val constWidth = 600
             val constHeight = 720
@@ -178,9 +187,14 @@ object ImageMessageElementViewer : MessageElementViewer<Image>() {
                 pauseLoadWhenScrolling(true)
             },
             contentDescription = null,
-            state = rememberAsyncImageState(),
+            state = state,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.clip(RoundedCornerShape(8.dp))
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .placeholder(
+                    visible = visible,
+                    highlight = PlaceholderHighlight.shimmer()
+                )
         )
     }
 

@@ -22,7 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +35,12 @@ import androidx.compose.ui.unit.dp
 import cn.yurn.yutori.Guild
 import cn.yurn.yutori.User
 import cn.yurn.yutori.application.Conversation
+import com.eygraber.compose.placeholder.PlaceholderHighlight
+import com.eygraber.compose.placeholder.material3.placeholder
+import com.eygraber.compose.placeholder.material3.shimmer
 import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.LoadState
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -102,13 +110,23 @@ fun ConversationCard(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.weight(1F)
                 ) {
+                    val state = rememberAsyncImageState()
+                    var visible by remember { mutableStateOf(true) }
+                    if (state.loadState is LoadState.Success) {
+                        visible = false
+                    }
                     AsyncImage(
                         uri = conversation.avatar,
                         contentDescription = null,
+                        state = state,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
+                            .placeholder(
+                                visible = visible,
+                                highlight = PlaceholderHighlight.shimmer()
+                            )
                     )
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -199,13 +217,23 @@ fun GuildCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                val state = rememberAsyncImageState()
+                var visible by remember { mutableStateOf(true) }
+                if (state.loadState is LoadState.Success) {
+                    visible = false
+                }
                 AsyncImage(
                     uri = guild.avatar,
                     contentDescription = null,
+                    state = state,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
+                        .placeholder(
+                            visible = visible,
+                            highlight = PlaceholderHighlight.shimmer()
+                        )
                 )
                 Text(
                     text = guild.name ?: guild.id,
@@ -263,13 +291,23 @@ fun FriendCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                val state = rememberAsyncImageState()
+                var visible by remember { mutableStateOf(true) }
+                if (state.loadState is LoadState.Success) {
+                    visible = false
+                }
                 AsyncImage(
                     uri = user.avatar,
                     contentDescription = null,
+                    state = state,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
+                        .placeholder(
+                            visible = visible,
+                            highlight = PlaceholderHighlight.shimmer()
+                        )
                 )
                 Text(
                     text = user.nick ?: user.name ?: user.id,
