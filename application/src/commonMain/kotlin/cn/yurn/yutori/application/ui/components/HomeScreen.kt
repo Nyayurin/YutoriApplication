@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import cn.yurn.yutori.Guild
 import cn.yurn.yutori.User
 import cn.yurn.yutori.application.Conversation
-import coil3.compose.AsyncImage
+import com.github.panpf.sketch.AsyncImage
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -103,7 +103,7 @@ fun ConversationCard(
                     modifier = Modifier.weight(1F)
                 ) {
                     AsyncImage(
-                        model = conversation.avatar,
+                        uri = conversation.avatar,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -200,7 +200,7 @@ fun GuildCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 AsyncImage(
-                    model = guild.avatar,
+                    uri = guild.avatar,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -264,7 +264,7 @@ fun FriendCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 AsyncImage(
-                    model = user.avatar,
+                    uri = user.avatar,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

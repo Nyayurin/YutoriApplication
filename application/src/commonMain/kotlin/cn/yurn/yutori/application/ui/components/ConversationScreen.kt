@@ -61,7 +61,7 @@ import cn.yurn.yutori.message.element.Text
 import cn.yurn.yutori.message.element.Underline
 import cn.yurn.yutori.message.element.Video
 import cn.yurn.yutori.user
-import coil3.compose.AsyncImage
+import com.github.panpf.sketch.AsyncImage
 
 @Composable
 fun BottomInput(onMessageSend: (String) -> Unit) {
@@ -127,7 +127,7 @@ fun LeftBubble(event: Event<MessageEvent>) {
             .padding(end = 64.dp)
     ) {
         AsyncImage(
-            model = event.user.avatar,
+            uri = event.user.avatar,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -232,7 +232,7 @@ fun RightBubble(event: Event<MessageEvent>) {
             }
         }
         AsyncImage(
-            model = event.user.avatar,
+            uri = event.user.avatar,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier

@@ -3,26 +3,18 @@ package cn.yurn.yutori.application.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import cn.yurn.yutori.message.element.At
 import cn.yurn.yutori.message.element.Audio
@@ -52,12 +44,12 @@ import cn.yurn.yutori.message.element.Sup
 import cn.yurn.yutori.message.element.Text
 import cn.yurn.yutori.message.element.Underline
 import cn.yurn.yutori.message.element.Video
-import coil3.ImageLoader
-import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.ImageRequest
-import coil3.request.crossfade
-import kotlinx.coroutines.launch
+import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.ComposableImageRequest
+import com.github.panpf.sketch.request.LoadState
+import com.github.panpf.sketch.request.pauseLoadWhenScrolling
+import com.github.panpf.sketch.resize.SizeResolver
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -164,43 +156,32 @@ object ImageMessageElementViewer : MessageElementViewer<Image>() {
 
     @Composable
     override fun Content(element: Image) {
-        val localDensity = LocalDensity.current
-//        val screenWidth = localDensity.run { viewModel.screen.width.toPx() }
-//        val screenHeight = localDensity.run { viewModel.screen.height.toPx() }
-        val context = LocalPlatformContext.current
-        var size by remember { mutableStateOf<DpSize?>(null) }
-        val scope = rememberCoroutineScope()
-        scope.launch {
-            ImageLoader(context).execute(
-                ImageRequest.Builder(context)
-                    .data(element.src)
-                    .build()
-            ).image?.let { image ->
-                val constWidth = 600
-                val constHeight = 720
-//                val maxWidth = ((screenWidth / 1080F) * constWidth).roundToInt()
-//                val maxHeight = ((screenHeight / 1920F) * constHeight).roundToInt()
-                val maxWidth = constWidth
-                val maxHeight = constHeight
-                val ratio =
-                    min(maxWidth / image.width.toDouble(), maxHeight / image.height.toDouble())
-                size = DpSize(
-                    localDensity.run { (ratio * image.width).roundToInt().toDp() },
-                    localDensity.run { (ratio * image.height).roundToInt().toDp() }
-                )
-            }
-        }
-        if (size != null) {
-            AsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(element.src)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(size!!)
+        var sizeResolver: SizeResolver? = null
+        val state = rememberAsyncImageState()
+        val loadState = state.loadState
+        if (loadState is LoadState.Success) {
+            val image = loadState.result.image
+            val constWidth = 600
+            val constHeight = 720
+            val ratio = min(
+                constWidth / image.width.toDouble(),
+                constHeight / image.height.toDouble()
+            )
+            sizeResolver = SizeResolver(
+                (ratio * image.width).roundToInt(),
+                (ratio * image.height).roundToInt()
             )
         }
+        AsyncImage(
+            request = ComposableImageRequest(element.src) {
+                resize(size = sizeResolver)
+                pauseLoadWhenScrolling(true)
+            },
+            contentDescription = null,
+            state = rememberAsyncImageState(),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.clip(RoundedCornerShape(8.dp))
+        )
     }
 
     @Composable
@@ -680,7 +661,7 @@ object ButtonMessageElementViewer : MessageElementViewer<Button>() {
 
 object UnsupportedMessageElementViewer : MessageElementViewer<MessageElement>() {
     override fun preview(element: MessageElement): String {
-         return "[未支持的消息]"
+        return "[未支持的消息]"
     }
 
     @Composable

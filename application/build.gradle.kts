@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -13,7 +14,13 @@ plugins {
 kotlin {
     jvmToolchain(17)
 
-    androidTarget()
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            freeCompilerArgs.add("-P")
+            freeCompilerArgs.add("plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=${project.path}/src/androidMain/compose_compiler_config.conf")
+        }
+    }
 
     jvm()
 
@@ -36,14 +43,18 @@ kotlin {
             implementation(compose.components.resources)
             implementation(libs.lifecycle.viewModel.compose)
             implementation(libs.navigation.compose)
-            implementation(libs.coil.compose)
-            implementation(libs.coil.network.ktor)
             implementation(libs.yutori)
             implementation(libs.yutorix.satori.core)
             implementation(libs.yutorix.satori.adapter)
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.serialization)
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.compose.settings)
+            implementation(libs.compose.settings.extended)
+            implementation(libs.sketch.compose)
+            implementation(libs.sketch.extensions.compose)
+            implementation(libs.sketch.svg)
+            implementation(libs.sketch.animated)
         }
 
         androidMain.dependencies {
@@ -52,7 +63,6 @@ kotlin {
             implementation(libs.startup.runtime)
             implementation(libs.activity.compose)
             implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.coil.gif)
             implementation(libs.sqldelight.android)
         }
 

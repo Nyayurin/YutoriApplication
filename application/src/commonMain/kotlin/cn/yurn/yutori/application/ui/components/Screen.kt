@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -82,7 +83,8 @@ import cn.yurn.yutori.application.self
 import cn.yurn.yutori.application.userChannels
 import cn.yurn.yutori.channel
 import cn.yurn.yutori.user
-import coil3.compose.AsyncImage
+import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import yutoriapplication.application.generated.resources.Res
@@ -131,7 +133,7 @@ fun HomeScreen(navController: NavController) {
                                 },
                                 icon = {
                                     AsyncImage(
-                                        model = self?.avatar,
+                                        uri = self?.avatar,
                                         contentDescription = null,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
@@ -198,7 +200,7 @@ fun HomeScreen(navController: NavController) {
                         ) {
                             val self = Data.self()?.user
                             AsyncImage(
-                                model = self?.avatar,
+                                uri = self?.avatar,
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
@@ -584,7 +586,10 @@ fun ConversationGuildScreen(navController: NavController, guild: Guild) {
             )
         }
     ) { paddingValues ->
+        val state = rememberLazyListState()
+        bindPauseLoadWhenScrolling(state)
         LazyColumn(
+            state = state,
             reverseLayout = true,
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
@@ -663,7 +668,10 @@ fun ConversationUserScreen(navController: NavController, user: User) {
             )
         }
     ) { paddingValues ->
+        val state = rememberLazyListState()
+        bindPauseLoadWhenScrolling(state)
         LazyColumn(
+            state = state,
             reverseLayout = true,
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),

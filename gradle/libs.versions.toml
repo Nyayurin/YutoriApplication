@@ -5,22 +5,20 @@ agp = "8.6.1"
 coroutines = "1.9.0"
 startup = "1.2.0"
 activity = "1.9.2"
-coil = "3.0.0-alpha10"
 lifecycle = "2.8.0"
 navigation = "2.8.0-alpha09"
 yutori = "6df4cf804e06662977abc587b4114c13c1064459"
 yutorix-satori = "8f5b388f259878e7bf8374a8636ef92e9e3f40a9"
 multiplatform-settings = "1.2.0"
 sqldelight = "2.0.2"
+compose-settings = "2.5.0"
+sketch = "4.0.0-alpha08"
 
 [libraries]
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startup" }
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
-coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
-coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil" }
 lifecycle-viewModel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
 yutori = { module = "cn.yurn.yutori:yutori", version.ref = "yutori" }
@@ -32,6 +30,12 @@ sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.re
 sqldelight-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-js = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+compose-settings = { module = "com.github.alorma.compose-settings:ui-tiles", version.ref = "compose-settings" }
+compose-settings-extended = { module = "com.github.alorma.compose-settings:ui-tiles-extended", version.ref = "compose-settings" }
+sketch-compose = { module = "io.github.panpf.sketch4:sketch-compose", version.ref = "sketch" }
+sketch-extensions-compose = { module = "io.github.panpf.sketch4:sketch-extensions-compose", version.ref = "sketch" }
+sketch-svg = { module = "io.github.panpf.sketch4:sketch-svg", version.ref = "sketch" }
+sketch-animated = { module = "io.github.panpf.sketch4:sketch-animated", version.ref = "sketch" }
 
 [plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

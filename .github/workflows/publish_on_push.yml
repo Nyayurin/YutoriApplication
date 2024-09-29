@@ -23,13 +23,13 @@ jobs:
           echo "SIGNING_KEY_PASSWORD=${{ secrets.SIGNING_KEY_PASSWORD }}" >> $GITHUB_ENV
           echo "VERSION=$(date +'%y.%m.%d')" >> $GITHUB_ENV
           chmod +x ./gradlew
-      - name: Package androidRelease
+      - name: Package android
         run: ./gradlew :application:assembleRelease
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
-          name: androidRelease
+          name: android
           path: application/build/outputs/apk/release/application-release.apk
   package-windows:
     runs-on: windows-latest

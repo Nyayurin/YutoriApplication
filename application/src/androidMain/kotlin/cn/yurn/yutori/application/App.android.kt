@@ -2,6 +2,7 @@ package cn.yurn.yutori.application
 
 import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,10 +10,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import cn.yurn.yutori.Yutori
-import coil3.ImageLoader
-import coil3.SingletonImageLoader
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.github.panpf.sketch.SingletonSketch
+import com.github.panpf.sketch.Sketch
+import com.github.panpf.sketch.cache.MemoryCache
+import com.github.panpf.sketch.decode.GifAnimatedDecoder
+import com.github.panpf.sketch.decode.GifMovieDecoder
+import com.github.panpf.sketch.decode.SvgDecoder
+import com.github.panpf.sketch.decode.WebpAnimatedDecoder
+import com.github.panpf.sketch.request.PauseLoadWhenScrollingDecodeInterceptor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -26,16 +31,26 @@ class AppActivity : ComponentActivity() {
             navController = rememberNavController()
             App(navController)
         }
-        SingletonImageLoader.setSafe { context ->
-            ImageLoader.Builder(context)
-                .components {
-                    if (SDK_INT >= 28) {
-                        add(AnimatedImageDecoder.Factory())
-                    } else {
-                        add(GifDecoder.Factory())
+        SingletonSketch.setSafe { context ->
+            Sketch.Builder(context).apply {
+                memoryCache(MemoryCache.Builder(context)
+                    .maxSizePercent(0.25)
+                    .build())
+                components {
+                    addDecoder(SvgDecoder.Factory())
+                    addDecoder(
+                        if (SDK_INT >= VERSION_CODES.P) {
+                            GifAnimatedDecoder.Factory()
+                        } else {
+                            GifMovieDecoder.Factory()
+                        }
+                    )
+                    if (SDK_INT >= VERSION_CODES.P) {
+                        addDecoder(WebpAnimatedDecoder.Factory())
                     }
+                    addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
                 }
-                .build()
+            }.build()
         }
         applicationContext.startForegroundService(
             Intent(
