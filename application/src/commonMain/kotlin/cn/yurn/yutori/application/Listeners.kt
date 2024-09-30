@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package cn.yurn.yutori.application
 
 import androidx.compose.runtime.mutableStateListOf
@@ -10,6 +12,7 @@ import cn.yurn.yutori.MessageEvents
 import cn.yurn.yutori.RootActions
 import cn.yurn.yutori.SigningEvent
 import cn.yurn.yutori.Yutori
+import cn.yurn.yutori.application.viewmodel.AppViewModel
 import cn.yurn.yutori.channel
 import cn.yurn.yutori.guild
 import cn.yurn.yutori.message
@@ -22,7 +25,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
-fun makeYutori(): Yutori = yutori {
+fun makeYutori(viewModel: AppViewModel): Yutori = yutori {
     install(Adapter.Satori) {
         this.host = Setting.connectSetting!!.host
         this.port = Setting.connectSetting!!.port
@@ -31,47 +34,49 @@ fun makeYutori(): Yutori = yutori {
 
         onConnect { logins ->
             onConnect(
-                logins,
-                service,
-                yutori
+                viewModel = viewModel,
+                logins = logins,
+                service = service,
+                yutori = yutori
             )
         }
     }
     adapter {
         listening {
-            any { onAnyEvent() }
+            any { onAnyEvent(viewModel) }
         }
     }
 }
 
 suspend fun onConnect(
+    viewModel: AppViewModel,
     logins: List<Login>,
     service: SatoriActionService,
     yutori: Yutori
 ) {
     coroutineScope {
         for (login in logins) {
-            Data.logins.removeIf { it.platform == login.platform && it.self_id == login.self_id }
-            Data.logins += login
+            viewModel.logins.removeIf { it.platform == login.platform && it.self_id == login.self_id }
+            viewModel.logins += login
             val platform = login.platform!!
             val selfId = login.self_id!!
             val identify = Identify(platform, selfId)
-            Data.identify = identify
+            viewModel.identify = identify
             val actions = RootActions(
                 platform = platform,
                 self_id = selfId,
                 service = service,
                 yutori = yutori
             )
-            Data.actions[identify] = actions
+            viewModel.actions[identify] = actions
             launch {
                 val guild = async {
                     var guildNext: String? = null
-                    val guilds = Data.guilds.getOrPut(
+                    val guilds = viewModel.guilds.getOrPut(
                         key = identify,
                         defaultValue = { mutableStateListOf() }
                     )
-                    val channels = Data.guildChannels.getOrPut(
+                    val channels = viewModel.guildChannels.getOrPut(
                         key = identify,
                         defaultValue = { mutableMapOf() }
                     )
@@ -101,11 +106,11 @@ suspend fun onConnect(
                 }
                 val friend = async {
                     var next: String? = null
-                    val friends = Data.friends.getOrPut(
+                    val friends = viewModel.friends.getOrPut(
                         key = identify,
                         defaultValue = { mutableStateListOf() }
                     )
-                    val channels = Data.userChannels.getOrPut(
+                    val channels = viewModel.userChannels.getOrPut(
                         key = identify,
                         defaultValue = { mutableMapOf() }
                     )
@@ -115,11 +120,11 @@ suspend fun onConnect(
                             if (friends.find { it.id == user.id } == null) {
                                 friends += user
                             }
-                            if (user.id == Data.identify!!.selfId) {
-                                Data.logins.find {
+                            if (user.id == viewModel.identify!!.selfId) {
+                                viewModel.logins.find {
                                     it.platform == identify.platform && it.self_id == identify.selfId
                                 }?.let { find ->
-                                    Data.logins[Data.logins.indexOf(find)] = find.copy(user = user)
+                                    viewModel.logins[viewModel.logins.indexOf(find)] = find.copy(user = user)
                                 }
                             }
                             launch {
@@ -133,19 +138,19 @@ suspend fun onConnect(
                 }
                 guild.await()
                 friend.await()
-                Data.update()
+                viewModel.update()
             }
         }
-        Data.update()
+        viewModel.update()
     }
 }
 
-fun Context<SigningEvent>.onAnyEvent() {
+fun Context<SigningEvent>.onAnyEvent(viewModel: AppViewModel) {
     val identify = Identify(
         platform = event.platform,
         selfId = event.self_id
     )
-    val events = Data.events.getOrPut(
+    val events = viewModel.events.getOrPut(
         key = identify,
         defaultValue = { mutableStateListOf() }
     )
@@ -154,7 +159,7 @@ fun Context<SigningEvent>.onAnyEvent() {
     when (event.type) {
         MessageEvents.Created -> {
             val event = event as Event<MessageEvent>
-            val conversations = Data.conversations.getOrPut(
+            val conversations = viewModel.conversations.getOrPut(
                 key = identify,
                 defaultValue = { mutableStateListOf() }
             )
@@ -167,23 +172,23 @@ fun Context<SigningEvent>.onAnyEvent() {
                 }
             }.toString()
             val user = if (event.guild != null) null else {
-                Data.userChannels().filterValues {
+                viewModel.userChannels().filterValues {
                     it.id == event.channel.id
                 }.firstNotNullOf { (key, _) ->
-                    Data.friends().find { it.id == key }
+                    viewModel.friends().find { it.id == key }
                 }
             }
             val avatar = when (type) {
                 "guild" -> {
-                    val guild = Data.guilds().find { it.id == event.guild?.id }!!
+                    val guild = viewModel.guilds().find { it.id == event.guild?.id }!!
                     event.guild?.avatar ?: guild.avatar
                 }
 
                 "user" -> {
-                    val user = Data.userChannels().filterValues {
+                    val user = viewModel.userChannels().filterValues {
                         it.id == event.channel.id
                     }.firstNotNullOf { (key, _) ->
-                        Data.friends().find { it.id == key }
+                        viewModel.friends().find { it.id == key }
                     }
                     user.avatar
                 }
@@ -192,15 +197,15 @@ fun Context<SigningEvent>.onAnyEvent() {
             }
             val name = when (type) {
                 "guild" -> {
-                    val guild = Data.guilds().find { it.id == event.guild?.id }!!
+                    val guild = viewModel.guilds().find { it.id == event.guild?.id }!!
                     event.guild?.name ?: guild.name ?: guild.id
                 }
 
                 "user" -> {
-                    val user = Data.userChannels().filterValues {
+                    val user = viewModel.userChannels().filterValues {
                         it.id == event.channel.id
                     }.firstNotNullOf { (key, _) ->
-                        Data.friends().find { it.id == key }
+                        viewModel.friends().find { it.id == key }
                     }
                     user.nick ?: user.name ?: user.id
                 }
@@ -217,8 +222,8 @@ fun Context<SigningEvent>.onAnyEvent() {
                 append(previewMessageContent(event.message.content))
             }
             val unread = event.user.id != event.self_id && when (type) {
-                "guild" -> event.guild!!.id != Data.conversation?.guild?.id
-                "user" -> event.channel.id != Data.conversation?.channel?.id
+                "guild" -> event.guild!!.id != viewModel.conversation?.guild?.id
+                "user" -> event.channel.id != viewModel.conversation?.channel?.id
                 else -> error("Unsupported type: $type")
             }
             conversations += Conversation(
@@ -235,5 +240,5 @@ fun Context<SigningEvent>.onAnyEvent() {
             conversations.sortByDescending { it.updatedAt }
         }
     }
-    Data.update()
+    viewModel.update()
 }

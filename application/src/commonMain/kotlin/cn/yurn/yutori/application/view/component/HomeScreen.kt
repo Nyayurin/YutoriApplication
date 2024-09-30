@@ -1,4 +1,4 @@
-package cn.yurn.yutori.application.ui.components
+package cn.yurn.yutori.application.view.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,7 +22,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,24 +47,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import cn.yurn.yutori.Guild
 import cn.yurn.yutori.Login
 import cn.yurn.yutori.User
 import cn.yurn.yutori.application.Conversation
-import cn.yurn.yutori.application.Data
 import cn.yurn.yutori.application.Identify
-import cn.yurn.yutori.application.conversations
-import cn.yurn.yutori.application.friends
-import cn.yurn.yutori.application.guilds
-import cn.yurn.yutori.application.self
 import com.eygraber.compose.placeholder.PlaceholderHighlight
 import com.eygraber.compose.placeholder.material3.placeholder
 import com.eygraber.compose.placeholder.material3.shimmer
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.LoadState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -83,21 +74,45 @@ import yutoriapplication.application.generated.resources.person_24px
 import yutoriapplication.application.generated.resources.settings_24px
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    identify: Identify?,
+    logins: List<Login>,
+    onSwitchUser: (Identify) -> Unit,
+    onEnterSetting: () -> Unit,
+    conversations: List<Conversation>,
+    onEnterConversation: (Conversation) -> Unit,
+    guilds: List<Guild>,
+    onEnterGuild: (Guild) -> Unit,
+    friends: List<User>,
+    onEnterUser: (User) -> Unit,
+    modifier: Modifier = Modifier.fillMaxSize()
+) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            Drawer(navController)
-        }
+            Drawer(
+                identify = identify,
+                logins = logins,
+                onSwitchUser = onSwitchUser,
+                onEnterSetting = onEnterSetting
+            )
+        },
+        modifier = modifier
     ) {
         var page by remember { mutableStateOf(0) }
         Scaffold(
             topBar = {
                 TopBar(
-                    scope = scope,
-                    drawerState = drawerState
+                    login = logins.find {
+                        it.platform == identify?.platform && it.self_id == identify?.selfId
+                    },
+                    onOpenDrawer = {
+                        scope.launch {
+                            drawerState.open()
+                        }
+                    }
                 )
             },
             bottomBar = {
@@ -107,25 +122,11 @@ fun HomeScreen(navController: NavController) {
                 )
             }
         ) { innerPaddings ->
-            Data.identify ?: return@Scaffold
-            val conversations = Data.conversations()
-            val guilds = Data.guilds()
-            val friends = Data.friends()
+            identify ?: return@Scaffold
             when (page) {
                 0 -> ConversationList(
                     conversationList = conversations,
-                    onClick = { conversation ->
-                        conversations[conversations.indexOf(conversation)] =
-                            conversation.copy(unread = false)
-                        Data.conversation = conversation
-                        navController.navigate(
-                            when (conversation.type) {
-                                "guild" -> "conversation/guild/${conversation.guild!!.id}"
-                                "user" -> "conversation/user/${conversation.user!!.id}"
-                                else -> throw UnsupportedOperationException("Unsupported conversation: ${conversation.type}")
-                            }
-                        )
-                    },
+                    onClick = onEnterConversation,
                     modifier = Modifier
                         .padding(innerPaddings)
                         .fillMaxSize()
@@ -133,14 +134,7 @@ fun HomeScreen(navController: NavController) {
 
                 1 -> GuildList(
                     guildList = guilds,
-                    onClick = { guild ->
-                        val find = conversations.find { it.guild?.id == guild.id }
-                        if (find != null) {
-                            conversations[conversations.indexOf(find)] = find.copy(unread = false)
-                            Data.conversation = find
-                        }
-                        navController.navigate("conversation/guild/${guild.id}")
-                    },
+                    onClick = onEnterGuild,
                     modifier = Modifier
                         .padding(innerPaddings)
                         .fillMaxSize()
@@ -148,17 +142,7 @@ fun HomeScreen(navController: NavController) {
 
                 2 -> FriendList(
                     friendList = friends,
-                    onClick = { user ->
-                        scope.launch {
-                            val find = conversations.find { it.user?.id == user.id }
-                            if (find != null) {
-                                conversations[conversations.indexOf(find)] =
-                                    find.copy(unread = false)
-                                Data.conversation = find
-                            }
-                            navController.navigate("conversation/user/${user.id}")
-                        }
-                    },
+                    onClick = onEnterUser,
                     modifier = Modifier
                         .padding(innerPaddings)
                         .fillMaxSize()
@@ -169,19 +153,26 @@ fun HomeScreen(navController: NavController) {
 }
 
 @Composable
-private fun Drawer(navController: NavController) {
-    ModalDrawerSheet(modifier = Modifier.width(220.dp)) {
+private fun Drawer(
+    identify: Identify?,
+    logins: List<Login>,
+    onSwitchUser: (Identify) -> Unit,
+    onEnterSetting: () -> Unit,
+    modifier: Modifier = Modifier
+        .width(220.dp)
+        .padding(12.dp)
+        .fillMaxHeight()
+) {
+    ModalDrawerSheet {
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxHeight()
+            modifier = modifier
         ) {
             Column {
-                for (login in Data.logins) {
+                for (login in logins) {
                     val self = login.user
-                    val status = when (Data.logins.find {
-                        it.platform == Data.identify?.platform && it.self_id == Data.identify?.selfId
+                    val status = when (logins.find {
+                        it.platform == identify?.platform && it.self_id == identify?.selfId
                     }?.status) {
                         Login.Status.OFFLINE -> "Offline"
                         Login.Status.ONLINE -> "Online"
@@ -225,9 +216,9 @@ private fun Drawer(navController: NavController) {
                                 overflow = TextOverflow.Ellipsis
                             )
                         },
-                        selected = Data.identify?.platform == login.platform && Data.identify?.selfId == login.self_id,
+                        selected = identify?.platform == login.platform && identify?.selfId == login.self_id,
                         onClick = {
-                            Data.identify = Identify(login.platform!!, login.self_id!!)
+                            onSwitchUser(Identify(login.platform!!, login.self_id!!))
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -249,7 +240,7 @@ private fun Drawer(navController: NavController) {
                     )
                 },
                 selected = false,
-                onClick = { navController.navigate("setting") },
+                onClick = onEnterSetting,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -258,26 +249,24 @@ private fun Drawer(navController: NavController) {
 
 @Composable
 private fun TopBar(
-    scope: CoroutineScope,
-    drawerState: DrawerState
+    login: Login?,
+    onOpenDrawer: () -> Unit,
+    modifier: Modifier = Modifier
+        .padding(horizontal = 24.dp)
+        .fillMaxWidth()
+        .height(80.dp)
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainer
-    ) {
+    Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .statusBarsPadding()
-                .padding(horizontal = 24.dp)
-                .fillMaxWidth()
-                .height(80.dp)
+            modifier = modifier
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                val self = Data.self()?.user
+                val self = login?.user
                 val state = rememberAsyncImageState()
                 var visible by remember { mutableStateOf(true) }
                 if (state.loadState is LoadState.Success) {
@@ -291,11 +280,7 @@ private fun TopBar(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .clickable {
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        }
+                        .clickable(onClick = onOpenDrawer)
                         .placeholder(
                             visible = visible,
                             highlight = PlaceholderHighlight.shimmer()
@@ -309,9 +294,7 @@ private fun TopBar(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    val status = when (Data.logins.find {
-                        it.platform == Data.identify?.platform && it.self_id == Data.identify?.selfId
-                    }?.status) {
+                    val status = when (login?.status) {
                         Login.Status.OFFLINE -> "Offline"
                         Login.Status.ONLINE -> "Online"
                         Login.Status.CONNECT -> "Connect"
@@ -343,8 +326,12 @@ private fun TopBar(
 }
 
 @Composable
-private fun BottomBar(page: Int, onChangePage: (Int) -> Unit) {
-    NavigationBar {
+private fun BottomBar(
+    page: Int,
+    onChangePage: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    NavigationBar(modifier = modifier) {
         NavigationBarItem(
             selected = page == 0,
             onClick = { onChangePage(0) },
@@ -436,7 +423,10 @@ private fun ConversationList(
 @Composable
 private fun ConversationCard(
     conversation: Conversation,
-    onClick: (Conversation) -> Unit
+    onClick: (Conversation) -> Unit,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(80.dp)
 ) {
     val format = remember {
         LocalDateTime.Format {
@@ -445,20 +435,14 @@ private fun ConversationCard(
             minute()
         }
     }
-    BadgedBox(
-        badge = {
-            if (conversation.unread) {
-                Badge()
-            }
-        }
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
+        onClick = { onClick(conversation) },
+        modifier = modifier
     ) {
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
-            onClick = { onClick(conversation) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
+        BadgedBox(
+            badge = { if (conversation.unread) Badge() }
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -558,15 +542,16 @@ private fun GuildList(
 @Composable
 private fun GuildCard(
     guild: Guild,
-    onClick: (Guild) -> Unit
+    onClick: (Guild) -> Unit,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(64.dp)
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
         onClick = { onClick(guild) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
+        modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -632,15 +617,16 @@ private fun FriendList(
 @Composable
 private fun FriendCard(
     user: User,
-    onClick: (User) -> Unit
+    onClick: (User) -> Unit,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(64.dp)
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh),
         onClick = { onClick(user) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
+        modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

@@ -1,14 +1,17 @@
-package cn.yurn.yutori.application.ui.theme
+package cn.yurn.yutori.application.view.theme
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cn.yurn.yutori.application.Setting
 
@@ -136,7 +139,17 @@ fun YutoriApplicationTheme(content: @Composable () -> Unit) {
         animateColorAsState(platformColorScheme.surfaceContainerLowest, animationSpec).value
     )
 
-    MaterialTheme(colorScheme = colorScheme, typography = platformTypography(), content = content)
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = platformTypography()
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            content()
+        }
+    }
 }
 
 @Composable

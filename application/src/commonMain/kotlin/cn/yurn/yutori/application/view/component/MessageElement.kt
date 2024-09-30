@@ -1,4 +1,4 @@
-package cn.yurn.yutori.application.ui.components
+package cn.yurn.yutori.application.view.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -1,4 +1,4 @@
-package cn.yurn.yutori.application.ui.components
+package cn.yurn.yutori.application.view.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -46,14 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import cn.yurn.yutori.Login
-import cn.yurn.yutori.application.ConnectSetting
-import cn.yurn.yutori.application.Data
 import cn.yurn.yutori.application.Setting
-import cn.yurn.yutori.application.makeYutori
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import yutoriapplication.application.generated.resources.Res
@@ -63,7 +56,11 @@ import yutoriapplication.application.generated.resources.palette_24px
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingScreen(navController: NavController) {
+fun SettingScreen(
+    onBack: () -> Unit,
+    onConnect: (host: String, port: Int, path: String, token: String) -> Unit,
+    modifier: Modifier = Modifier.fillMaxSize()
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -76,7 +73,7 @@ fun SettingScreen(navController: NavController) {
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { navController.popBackStack() },
+                        onClick = onBack,
                         modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
@@ -94,7 +91,7 @@ fun SettingScreen(navController: NavController) {
                 )
             )
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
     ) { innerPaddings ->
         Box(
             modifier = Modifier
@@ -138,21 +135,12 @@ fun SettingScreen(navController: NavController) {
                 ModalBottomSheet(
                     onDismissRequest = { showConnect = false }
                 ) {
-                    Connect { host, port, path, token ->
-                        Setting.connectSetting = ConnectSetting(
-                            host = host,
-                            port = port,
-                            path = path,
-                            token = token
-                        )
-                        Data.logins.replaceAll { it.copy(status = Login.Status.CONNECT) }
-                        Data.yutori?.stop()
-                        Data.yutori = makeYutori()
-                        Data.viewModelScope.launch {
-                            Data.yutori!!.start()
+                    Connect(
+                        onClick = { host, port, path, token ->
+                            onConnect(host, port, path, token)
+                            showConnect = false
                         }
-                        showConnect = false
-                    }
+                    )
                 }
             }
         }
@@ -160,15 +148,21 @@ fun SettingScreen(navController: NavController) {
 }
 
 @Composable
-fun SettingItem(title: String, description: String, icon: DrawableResource, onClick: () -> Unit) {
+private fun SettingItem(
+    title: String,
+    description: String,
+    icon: DrawableResource,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(80.dp)
+) {
     ElevatedCard(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.elevatedCardElevation(3.dp, 3.dp, 3.dp, 3.dp, 3.dp, 3.dp),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceBright),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp)
+        modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -211,7 +205,13 @@ fun SettingItem(title: String, description: String, icon: DrawableResource, onCl
 }
 
 @Composable
-fun Connect(onClick: (host: String, port: Int, path: String, token: String) -> Unit) {
+private fun Connect(
+    onClick: (host: String, port: Int, path: String, token: String) -> Unit,
+    modifier: Modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())
+) {
     var host by remember { mutableStateOf(Setting.connectSetting?.host ?: "") }
     var port by remember { mutableStateOf(Setting.connectSetting?.port?.toString() ?: "") }
     var path by remember { mutableStateOf(Setting.connectSetting?.path ?: "") }
@@ -220,10 +220,7 @@ fun Connect(onClick: (host: String, port: Int, path: String, token: String) -> U
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+        modifier = modifier
     ) {
         OutlinedTextField(
             value = host,

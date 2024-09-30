@@ -1,4 +1,4 @@
-package cn.yurn.yutori.application.ui.theme
+package cn.yurn.yutori.application.view.theme
 
 import androidx.compose.ui.graphics.Color
 

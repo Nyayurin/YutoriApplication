@@ -1,15 +1,19 @@
-package cn.yurn.yutori.application.ui.theme
+package cn.yurn.yutori.application.view.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import cn.yurn.yutori.application.Setting
 import org.jetbrains.compose.resources.Font
@@ -18,9 +22,17 @@ import yutoriapplication.application.generated.resources.Res
 
 @Composable
 actual fun platformColorScheme(): ColorScheme {
-    return when (Setting.darkMode ?: isSystemInDarkTheme()) {
-        true -> darkScheme
-        else -> lightScheme
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val context = LocalContext.current
+        when (Setting.darkMode ?: isSystemInDarkTheme()) {
+            true -> dynamicDarkColorScheme(context)
+            else -> dynamicLightColorScheme(context)
+        }
+    } else {
+        when (Setting.darkMode ?: isSystemInDarkTheme()) {
+            true -> darkScheme
+            else -> lightScheme
+        }
     }
 }
 

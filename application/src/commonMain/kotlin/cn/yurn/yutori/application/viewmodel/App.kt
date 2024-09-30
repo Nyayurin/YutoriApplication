@@ -1,4 +1,4 @@
-package cn.yurn.yutori.application
+package cn.yurn.yutori.application.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +14,14 @@ import cn.yurn.yutori.RootActions
 import cn.yurn.yutori.SigningEvent
 import cn.yurn.yutori.User
 import cn.yurn.yutori.Yutori
+import cn.yurn.yutori.application.Conversation
+import cn.yurn.yutori.application.EventSerializer
+import cn.yurn.yutori.application.GuildSerializer
+import cn.yurn.yutori.application.Identify
+import cn.yurn.yutori.application.LoginSerializer
+import cn.yurn.yutori.application.MutableStateListSerializer
+import cn.yurn.yutori.application.UserSerializer
+import cn.yurn.yutori.application.settings
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.serialization.decodeValue
 import com.russhwolf.settings.serialization.decodeValueOrNull
@@ -26,7 +34,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalSerializationApi::class, ExperimentalSettingsApi::class)
-object Data : ViewModel() {
+class AppViewModel : ViewModel() {
     private val json = Json {
         allowStructuredMapKeys = true
     }

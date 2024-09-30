@@ -9,33 +9,34 @@ import cn.yurn.yutori.Login
 import cn.yurn.yutori.RootActions
 import cn.yurn.yutori.SigningEvent
 import cn.yurn.yutori.User
-import cn.yurn.yutori.application.ui.components.AtMessageElementViewer
-import cn.yurn.yutori.application.ui.components.AudioMessageElementViewer
-import cn.yurn.yutori.application.ui.components.AuthorMessageElementViewer
-import cn.yurn.yutori.application.ui.components.BoldMessageElementViewer
-import cn.yurn.yutori.application.ui.components.BrMessageElementViewer
-import cn.yurn.yutori.application.ui.components.ButtonMessageElementViewer
-import cn.yurn.yutori.application.ui.components.CodeMessageElementViewer
-import cn.yurn.yutori.application.ui.components.DeleteMessageElementViewer
-import cn.yurn.yutori.application.ui.components.EmMessageElementViewer
-import cn.yurn.yutori.application.ui.components.FileMessageElementViewer
-import cn.yurn.yutori.application.ui.components.HrefMessageElementViewer
-import cn.yurn.yutori.application.ui.components.IdiomaticMessageElementViewer
-import cn.yurn.yutori.application.ui.components.ImageMessageElementViewer
-import cn.yurn.yutori.application.ui.components.InsMessageElementViewer
-import cn.yurn.yutori.application.ui.components.MessageMessageElementViewer
-import cn.yurn.yutori.application.ui.components.ParagraphMessageElementViewer
-import cn.yurn.yutori.application.ui.components.QuoteMessageElementViewer
-import cn.yurn.yutori.application.ui.components.SharpMessageElementViewer
-import cn.yurn.yutori.application.ui.components.SplMessageElementViewer
-import cn.yurn.yutori.application.ui.components.StrikethroughMessageElementViewer
-import cn.yurn.yutori.application.ui.components.StrongMessageElementViewer
-import cn.yurn.yutori.application.ui.components.SubMessageElementViewer
-import cn.yurn.yutori.application.ui.components.SupMessageElementViewer
-import cn.yurn.yutori.application.ui.components.TextMessageElementViewer
-import cn.yurn.yutori.application.ui.components.UnderlineMessageElementViewer
-import cn.yurn.yutori.application.ui.components.UnsupportedMessageElementViewer
-import cn.yurn.yutori.application.ui.components.VideoMessageElementViewer
+import cn.yurn.yutori.application.view.component.AtMessageElementViewer
+import cn.yurn.yutori.application.view.component.AudioMessageElementViewer
+import cn.yurn.yutori.application.view.component.AuthorMessageElementViewer
+import cn.yurn.yutori.application.view.component.BoldMessageElementViewer
+import cn.yurn.yutori.application.view.component.BrMessageElementViewer
+import cn.yurn.yutori.application.view.component.ButtonMessageElementViewer
+import cn.yurn.yutori.application.view.component.CodeMessageElementViewer
+import cn.yurn.yutori.application.view.component.DeleteMessageElementViewer
+import cn.yurn.yutori.application.view.component.EmMessageElementViewer
+import cn.yurn.yutori.application.view.component.FileMessageElementViewer
+import cn.yurn.yutori.application.view.component.HrefMessageElementViewer
+import cn.yurn.yutori.application.view.component.IdiomaticMessageElementViewer
+import cn.yurn.yutori.application.view.component.ImageMessageElementViewer
+import cn.yurn.yutori.application.view.component.InsMessageElementViewer
+import cn.yurn.yutori.application.view.component.MessageMessageElementViewer
+import cn.yurn.yutori.application.view.component.ParagraphMessageElementViewer
+import cn.yurn.yutori.application.view.component.QuoteMessageElementViewer
+import cn.yurn.yutori.application.view.component.SharpMessageElementViewer
+import cn.yurn.yutori.application.view.component.SplMessageElementViewer
+import cn.yurn.yutori.application.view.component.StrikethroughMessageElementViewer
+import cn.yurn.yutori.application.view.component.StrongMessageElementViewer
+import cn.yurn.yutori.application.view.component.SubMessageElementViewer
+import cn.yurn.yutori.application.view.component.SupMessageElementViewer
+import cn.yurn.yutori.application.view.component.TextMessageElementViewer
+import cn.yurn.yutori.application.view.component.UnderlineMessageElementViewer
+import cn.yurn.yutori.application.view.component.UnsupportedMessageElementViewer
+import cn.yurn.yutori.application.view.component.VideoMessageElementViewer
+import cn.yurn.yutori.application.viewmodel.AppViewModel
 import cn.yurn.yutori.message.element.At
 import cn.yurn.yutori.message.element.Audio
 import cn.yurn.yutori.message.element.Author
@@ -63,38 +64,38 @@ import cn.yurn.yutori.message.element.Text
 import cn.yurn.yutori.message.element.Underline
 import cn.yurn.yutori.message.element.Video
 
-fun Data.self(): Login? = logins.find {
+fun AppViewModel.self(): Login? = logins.find {
     it.platform == identify?.platform && it.self_id == identify?.selfId
 }
 
-fun Data.userChannels(): MutableMap<String, Channel> = userChannels.getOrPut(
+fun AppViewModel.userChannels(): MutableMap<String, Channel> = userChannels.getOrPut(
     key = identify!!,
     defaultValue = { mutableMapOf() }
 )
 
-fun Data.guildChannels(): MutableMap<String, SnapshotStateList<Channel>> = guildChannels.getOrPut(
+fun AppViewModel.guildChannels(): MutableMap<String, SnapshotStateList<Channel>> = guildChannels.getOrPut(
     key = identify!!,
     defaultValue = { mutableMapOf() }
 )
 
-fun Data.actions(): RootActions? = actions[identify!!]
+fun AppViewModel.actions(): RootActions? = actions[identify!!]
 
-fun Data.conversations(): MutableList<Conversation> = conversations.getOrPut(
+fun AppViewModel.conversations(): MutableList<Conversation> = conversations.getOrPut(
     key = identify!!,
     defaultValue = { mutableStateListOf() }
 )
 
-fun Data.guilds(): MutableList<Guild> = guilds.getOrPut(
+fun AppViewModel.guilds(): MutableList<Guild> = guilds.getOrPut(
     key = identify!!,
     defaultValue = { mutableStateListOf() }
 )
 
-fun Data.friends(): MutableList<User> = friends.getOrPut(
+fun AppViewModel.friends(): MutableList<User> = friends.getOrPut(
     key = identify!!,
     defaultValue = { mutableStateListOf() }
 )
 
-fun Data.events(): MutableList<Event<SigningEvent>> = events.getOrPut(
+fun AppViewModel.events(): MutableList<Event<SigningEvent>> = events.getOrPut(
     key = identify!!,
     defaultValue = { mutableStateListOf() }
 )
