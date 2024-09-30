@@ -1,9 +1,11 @@
 package cn.yurn.yutori.application.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,17 +14,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,9 +46,118 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import cn.yurn.yutori.Login
+import cn.yurn.yutori.application.ConnectSetting
+import cn.yurn.yutori.application.Data
 import cn.yurn.yutori.application.Setting
+import cn.yurn.yutori.application.makeYutori
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import yutoriapplication.application.generated.resources.Res
+import yutoriapplication.application.generated.resources.close_24px
+import yutoriapplication.application.generated.resources.login_24px
+import yutoriapplication.application.generated.resources.palette_24px
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingScreen(navController: NavController) {
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Setting",
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center
+                    )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        },
+        modifier = Modifier.fillMaxSize()
+    ) { innerPaddings ->
+        Box(
+            modifier = Modifier
+                .padding(innerPaddings)
+                .fillMaxSize()
+        ) {
+            var showConnect by remember { mutableStateOf(false) }
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                item {
+                    SettingItem(
+                        title = "Connect",
+                        description = "Connect to a satori server",
+                        icon = Res.drawable.login_24px,
+                        onClick = { showConnect = true }
+                    )
+                }
+                item {
+                    SettingItem(
+                        title = "Theme",
+                        description = "Customize your theme",
+                        icon = Res.drawable.palette_24px,
+                        onClick = {}
+                    )
+                }
+                item {
+                    SettingItem(
+                        title = "Quit",
+                        description = "Quit the application",
+                        icon = Res.drawable.close_24px,
+                        onClick = {}
+                    )
+                }
+            }
+            AnimatedVisibility(showConnect) {
+                ModalBottomSheet(
+                    onDismissRequest = { showConnect = false }
+                ) {
+                    Connect { host, port, path, token ->
+                        Setting.connectSetting = ConnectSetting(
+                            host = host,
+                            port = port,
+                            path = path,
+                            token = token
+                        )
+                        Data.logins.replaceAll { it.copy(status = Login.Status.CONNECT) }
+                        Data.yutori?.stop()
+                        Data.yutori = makeYutori()
+                        Data.viewModelScope.launch {
+                            Data.yutori!!.start()
+                        }
+                        showConnect = false
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun SettingItem(title: String, description: String, icon: DrawableResource, onClick: () -> Unit) {
