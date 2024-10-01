@@ -41,7 +41,6 @@
             android:name=".SavingService"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
-        <receiver android:name=".NotificationReplyReceiver" />
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
