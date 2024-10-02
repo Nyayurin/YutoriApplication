@@ -57,6 +57,10 @@ kotlin {
             implementation(libs.sketch.animated)
             implementation(libs.compose.dnd)
             implementation(libs.compose.placeholder)
+            implementation(libs.compose.material3.adaptive)
+            implementation(libs.compose.material3.adaptive.layout)
+            implementation(libs.compose.material3.adaptive.navigation)
+            implementation(libs.compose.material3.adaptive.navigation.suite)
         }
 
         androidMain.dependencies {
@@ -94,11 +98,11 @@ android {
         }
     }
     namespace = "cn.yurn.yutori.application"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
 
         applicationId = "cn.yurn.yutori.application"
         versionCode = 1

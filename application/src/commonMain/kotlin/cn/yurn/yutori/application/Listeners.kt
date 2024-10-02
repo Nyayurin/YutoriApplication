@@ -12,6 +12,8 @@ import cn.yurn.yutori.MessageEvents
 import cn.yurn.yutori.RootActions
 import cn.yurn.yutori.SigningEvent
 import cn.yurn.yutori.Yutori
+import cn.yurn.yutori.application.model.Conversation
+import cn.yurn.yutori.application.model.Identify
 import cn.yurn.yutori.application.viewmodel.AppViewModel
 import cn.yurn.yutori.channel
 import cn.yurn.yutori.guild

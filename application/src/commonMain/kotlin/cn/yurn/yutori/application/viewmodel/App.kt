@@ -14,10 +14,10 @@ import cn.yurn.yutori.RootActions
 import cn.yurn.yutori.SigningEvent
 import cn.yurn.yutori.User
 import cn.yurn.yutori.Yutori
-import cn.yurn.yutori.application.Conversation
+import cn.yurn.yutori.application.model.Conversation
 import cn.yurn.yutori.application.EventSerializer
 import cn.yurn.yutori.application.GuildSerializer
-import cn.yurn.yutori.application.Identify
+import cn.yurn.yutori.application.model.Identify
 import cn.yurn.yutori.application.LoginSerializer
 import cn.yurn.yutori.application.MutableStateListSerializer
 import cn.yurn.yutori.application.UserSerializer

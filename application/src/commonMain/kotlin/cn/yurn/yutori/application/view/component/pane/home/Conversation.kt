@@ -1,11 +1,10 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package cn.yurn.yutori.application.view.component
+package cn.yurn.yutori.application.view.component.pane.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -32,8 +32,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +42,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +62,33 @@ import cn.yurn.yutori.Login
 import cn.yurn.yutori.MessageEvent
 import cn.yurn.yutori.MessageEvents
 import cn.yurn.yutori.User
+import cn.yurn.yutori.application.view.component.AtMessageElementViewer
+import cn.yurn.yutori.application.view.component.AudioMessageElementViewer
+import cn.yurn.yutori.application.view.component.AuthorMessageElementViewer
+import cn.yurn.yutori.application.view.component.BoldMessageElementViewer
+import cn.yurn.yutori.application.view.component.BrMessageElementViewer
+import cn.yurn.yutori.application.view.component.ButtonMessageElementViewer
+import cn.yurn.yutori.application.view.component.CodeMessageElementViewer
+import cn.yurn.yutori.application.view.component.DeleteMessageElementViewer
+import cn.yurn.yutori.application.view.component.EmMessageElementViewer
+import cn.yurn.yutori.application.view.component.FileMessageElementViewer
+import cn.yurn.yutori.application.view.component.HrefMessageElementViewer
+import cn.yurn.yutori.application.view.component.IdiomaticMessageElementViewer
+import cn.yurn.yutori.application.view.component.ImageMessageElementViewer
+import cn.yurn.yutori.application.view.component.InsMessageElementViewer
+import cn.yurn.yutori.application.view.component.MessageMessageElementViewer
+import cn.yurn.yutori.application.view.component.ParagraphMessageElementViewer
+import cn.yurn.yutori.application.view.component.QuoteMessageElementViewer
+import cn.yurn.yutori.application.view.component.SharpMessageElementViewer
+import cn.yurn.yutori.application.view.component.SplMessageElementViewer
+import cn.yurn.yutori.application.view.component.StrikethroughMessageElementViewer
+import cn.yurn.yutori.application.view.component.StrongMessageElementViewer
+import cn.yurn.yutori.application.view.component.SubMessageElementViewer
+import cn.yurn.yutori.application.view.component.SupMessageElementViewer
+import cn.yurn.yutori.application.view.component.TextMessageElementViewer
+import cn.yurn.yutori.application.view.component.UnderlineMessageElementViewer
+import cn.yurn.yutori.application.view.component.UnsupportedMessageElementViewer
+import cn.yurn.yutori.application.view.component.VideoMessageElementViewer
 import cn.yurn.yutori.channel
 import cn.yurn.yutori.member
 import cn.yurn.yutori.message
@@ -103,9 +127,8 @@ import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.LoadState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConversationGuildScreen(
+fun ConversationGuildPane(
     login: Login?,
     onBack: () -> Unit,
     guild: Guild,
@@ -114,84 +137,16 @@ fun ConversationGuildScreen(
     events: List<Event<*>>,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
-    var expandChannels by remember { mutableStateOf(false) }
     var selectedChannel by remember { mutableStateOf(channels[0]) }
     Scaffold(
         topBar = {
-            Column(
-                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
-            ) {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = guild.name ?: guild.id,
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = onBack,
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = { expandChannels = !expandChannels },
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        actionIconContentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-                AnimatedVisibility(
-                    visible = expandChannels,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-                ) {
-                    HorizontalDivider()
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        contentPadding = PaddingValues(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 240.dp)
-                    ) {
-                        items(channels) { channel ->
-                            NavigationDrawerItem(
-                                label = {
-                                    Text(
-                                        text = channel.name ?: channel.id,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                },
-                                onClick = { selectedChannel = channel },
-                                selected = selectedChannel == channel,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(40.dp)
-                            )
-                        }
-                    }
-                }
-            }
+            TopBar(
+                onBack = onBack,
+                title = guild.name ?: guild.id,
+                channels = channels,
+                selectedChannel = selectedChannel,
+                onChangeChannel = { selectedChannel = it }
+            )
         },
         bottomBar = {
             BottomInput(
@@ -231,44 +186,22 @@ fun ConversationGuildScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConversationUserScreen(
+fun ConversationUserPane(
     login: Login?,
     onBack: () -> Unit,
     user: User,
     channel: Channel,
     onMessageCreate: (Channel, String) -> Unit,
     events: List<Event<*>>,
-    modifier: Modifier = Modifier.fillMaxSize()
+    modifier: Modifier = Modifier
+        .fillMaxSize()
 ) {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = user.nick ?: user.name ?: user.id,
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onBack,
-                        modifier = Modifier.size(48.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
+            TopBar(
+                onBack = onBack,
+                title = user.nick ?: user.name ?: user.id
             )
         },
         bottomBar = {
@@ -303,6 +236,102 @@ fun ConversationUserScreen(
                     RightBubble(event)
                 } else {
                     LeftBubble(event)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopBar(
+    onBack: () -> Unit,
+    title: String,
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    channels: List<Channel>? = null,
+    selectedChannel: Channel? = null,
+    onChangeChannel: ((Channel) -> Unit)? = null
+) {
+    var expandChannels by remember { mutableStateOf(false) }
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surfaceContainer
+    ) {
+        Column(
+            modifier = Modifier
+                .statusBarsPadding()
+                .fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (channels != null) {
+                    IconButton(
+                        onClick = { expandChannels = !expandChannels },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                } else {
+                    Spacer(
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            }
+        }
+        AnimatedVisibility(
+            visible = expandChannels,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            HorizontalDivider()
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 240.dp)
+            ) {
+                items(channels!!) { channel ->
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = channel.name ?: channel.id,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        onClick = { onChangeChannel!!(channel) },
+                        selected = selectedChannel == channel,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                    )
                 }
             }
         }

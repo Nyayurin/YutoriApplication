@@ -1,16 +1,20 @@
-package cn.yurn.yutori.application.view.component
+package cn.yurn.yutori.application.view.component.pane.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,12 +33,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,11 +54,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowWidthSizeClass
 import cn.yurn.yutori.Guild
 import cn.yurn.yutori.Login
 import cn.yurn.yutori.User
-import cn.yurn.yutori.application.Conversation
-import cn.yurn.yutori.application.Identify
+import cn.yurn.yutori.application.model.Conversation
+import cn.yurn.yutori.application.model.Identify
+import cn.yurn.yutori.application.view.component.AdaptiveNavigation
+import cn.yurn.yutori.application.view.component.AdaptiveNavigationType
 import com.eygraber.compose.placeholder.PlaceholderHighlight
 import com.eygraber.compose.placeholder.material3.placeholder
 import com.eygraber.compose.placeholder.material3.shimmer
@@ -75,23 +84,21 @@ import yutoriapplication.application.generated.resources.person_24px
 import yutoriapplication.application.generated.resources.settings_24px
 
 @Composable
-fun HomeScreen(
+fun HomePane(
     identify: Identify?,
     logins: List<Login>,
     onSwitchUser: (Identify) -> Unit,
     onEnterSetting: () -> Unit,
     conversations: List<Conversation>,
-    onEnterConversation: (Conversation) -> Unit,
     guilds: List<Guild>,
-    onEnterGuild: (Guild) -> Unit,
     friends: List<User>,
-    onEnterUser: (User) -> Unit,
+    onEnterConversation: (Any) -> Unit,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
+    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     ModalNavigationDrawer(
-        drawerState = drawerState,
         drawerContent = {
             Drawer(
                 identify = identify,
@@ -100,54 +107,131 @@ fun HomeScreen(
                 onEnterSetting = onEnterSetting
             )
         },
-        modifier = modifier
+        modifier = modifier,
+        drawerState = drawerState
     ) {
         var page by remember { mutableStateOf(0) }
-        Scaffold(
-            topBar = {
-                TopBar(
-                    login = logins.find {
-                        it.platform == identify?.platform && it.self_id == identify?.selfId
+        NavigationSuiteScaffoldLayout(
+            navigationSuite = {
+                AdaptiveNavigation(
+                    type = when (windowSize.windowWidthSizeClass) {
+                        WindowWidthSizeClass.COMPACT -> AdaptiveNavigationType.Bar
+                        else -> AdaptiveNavigationType.Rail
                     },
-                    onOpenDrawer = {
-                        scope.launch {
-                            drawerState.open()
+                    selected = page,
+                    onChange = { page = it }
+                ) {
+                    item(
+                        index = 0,
+                        icon = {
+                            Icon(
+                                painter = painterResource(Res.drawable.chat_bubble_24px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = "Message",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                    )
+                    item(
+                        index = 1,
+                        icon = {
+                            Icon(
+                                painter = painterResource(Res.drawable.groups_24px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = "Guild",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
-                    }
-                )
+                    )
+                    item(
+                        index = 2,
+                        icon = {
+                            Icon(
+                                painter = painterResource(Res.drawable.person_24px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = "Friend",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                    )
+                }
             },
-            bottomBar = {
-                BottomBar(
-                    page = page,
-                    onChangePage = { page = it }
-                )
+            layoutType = when (windowSize.windowWidthSizeClass) {
+                WindowWidthSizeClass.COMPACT -> NavigationSuiteType.NavigationBar
+                else -> NavigationSuiteType.NavigationRail
             }
-        ) { innerPaddings ->
-            identify ?: return@Scaffold
-            when (page) {
-                0 -> ConversationList(
-                    conversationList = conversations,
-                    onClick = onEnterConversation,
-                    modifier = Modifier
-                        .padding(innerPaddings)
-                        .fillMaxSize()
-                )
+        ) {
+            Scaffold(
+                topBar = {
+                    TopBar(
+                        login = logins.find {
+                            it.platform == identify?.platform && it.self_id == identify?.selfId
+                        },
+                        onOpenDrawer = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }
+                    )
+                },
+                contentWindowInsets = when (windowSize.windowWidthSizeClass) {
+                    WindowWidthSizeClass.COMPACT -> WindowInsets.statusBars.add(WindowInsets.captionBar)
+                    else -> ScaffoldDefaults.contentWindowInsets
+                },
+            ) { innerPaddings ->
+                identify ?: return@Scaffold
+                when (page) {
+                    0 -> ConversationList(
+                        conversationList = conversations,
+                        onClick = { onEnterConversation(it) },
+                        modifier = Modifier
+                            .padding(innerPaddings)
+                            .fillMaxSize()
+                    )
 
-                1 -> GuildList(
-                    guildList = guilds,
-                    onClick = onEnterGuild,
-                    modifier = Modifier
-                        .padding(innerPaddings)
-                        .fillMaxSize()
-                )
+                    1 -> GuildList(
+                        guildList = guilds,
+                        onClick = { onEnterConversation(it) },
+                        modifier = Modifier
+                            .padding(innerPaddings)
+                            .fillMaxSize()
+                    )
 
-                2 -> FriendList(
-                    friendList = friends,
-                    onClick = onEnterUser,
-                    modifier = Modifier
-                        .padding(innerPaddings)
-                        .fillMaxSize()
-                )
+                    2 -> FriendList(
+                        friendList = friends,
+                        onClick = { onEnterConversation(it) },
+                        modifier = Modifier
+                            .padding(innerPaddings)
+                            .fillMaxSize()
+                    )
+                }
             }
         }
     }
@@ -324,81 +408,6 @@ private fun TopBar(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun BottomBar(
-    page: Int,
-    onChangePage: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    NavigationBar(modifier = modifier) {
-        NavigationBarItem(
-            selected = page == 0,
-            onClick = { onChangePage(0) },
-            icon = {
-                Icon(
-                    painter = painterResource(Res.drawable.chat_bubble_24px),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = {
-                Text(
-                    text = "Message",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            },
-            modifier = Modifier.padding(start = 8.dp)
-        )
-        NavigationBarItem(
-            selected = page == 1,
-            onClick = { onChangePage(1) },
-            icon = {
-                Icon(
-                    painter = painterResource(Res.drawable.groups_24px),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = {
-                Text(
-                    text = "Guild",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        )
-        NavigationBarItem(
-            selected = page == 2,
-            onClick = { onChangePage(2) },
-            icon = {
-                Icon(
-                    painter = painterResource(Res.drawable.person_24px),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = {
-                Text(
-                    text = "Friend",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            },
-            modifier = Modifier.padding(end = 8.dp)
-        )
     }
 }
 

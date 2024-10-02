@@ -7,7 +7,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import cn.yurn.yutori.application.SavingService
+import cn.yurn.yutori.application.viewmodel.AppViewModel
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.MemoryCache
@@ -17,12 +19,13 @@ import com.github.panpf.sketch.decode.SvgDecoder
 import com.github.panpf.sketch.decode.WebpAnimatedDecoder
 import com.github.panpf.sketch.request.PauseLoadWhenScrollingDecodeInterceptor
 
-class AppActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
+    private val viewModel: AppViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            App()
+            App(viewModel = viewModel)
         }
         SingletonSketch.setSafe { context ->
             Sketch.Builder(context).apply {

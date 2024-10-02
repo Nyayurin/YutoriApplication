@@ -1,4 +1,4 @@
-package cn.yurn.yutori.application.view.component
+package cn.yurn.yutori.application.view.component.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -132,9 +131,7 @@ fun SettingScreen(
                 }
             }
             AnimatedVisibility(showConnect) {
-                ModalBottomSheet(
-                    onDismissRequest = { showConnect = false }
-                ) {
+                ModalBottomSheet(onDismissRequest = { showConnect = false }) {
                     Connect(
                         onClick = { host, port, path, token ->
                             onConnect(host, port, path, token)
@@ -262,7 +259,6 @@ private fun Connect(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
-                .imePadding()
         ) {
             Text(
                 text = "Save and connect",

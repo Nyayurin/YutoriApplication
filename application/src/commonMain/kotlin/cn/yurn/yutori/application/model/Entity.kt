@@ -1,8 +1,11 @@
-package cn.yurn.yutori.application
+package cn.yurn.yutori.application.model
 
 import cn.yurn.yutori.Channel
 import cn.yurn.yutori.Guild
 import cn.yurn.yutori.User
+import cn.yurn.yutori.application.ChannelSerializer
+import cn.yurn.yutori.application.GuildSerializer
+import cn.yurn.yutori.application.UserSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable

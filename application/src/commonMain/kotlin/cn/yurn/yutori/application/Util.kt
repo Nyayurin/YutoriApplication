@@ -9,6 +9,7 @@ import cn.yurn.yutori.Login
 import cn.yurn.yutori.RootActions
 import cn.yurn.yutori.SigningEvent
 import cn.yurn.yutori.User
+import cn.yurn.yutori.application.model.Conversation
 import cn.yurn.yutori.application.view.component.AtMessageElementViewer
 import cn.yurn.yutori.application.view.component.AudioMessageElementViewer
 import cn.yurn.yutori.application.view.component.AuthorMessageElementViewer

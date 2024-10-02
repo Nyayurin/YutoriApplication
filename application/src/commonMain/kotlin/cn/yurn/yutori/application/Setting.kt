@@ -1,5 +1,6 @@
 package cn.yurn.yutori.application
 
+import cn.yurn.yutori.application.model.ConnectSetting
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.boolean
