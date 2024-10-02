@@ -10,6 +10,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         val actor = providers.gradleProperty("gpr.actor").orNull ?: System.getenv("GITHUB_ACTOR")
         val token = providers.gradleProperty("gpr.token").orNull ?: System.getenv("GITHUB_TOKEN")

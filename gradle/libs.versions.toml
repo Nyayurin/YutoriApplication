@@ -7,6 +7,7 @@ startup = "1.2.0"
 activity = "1.9.2"
 lifecycle = "2.8.0"
 navigation = "2.8.0-alpha09"
+#noinspection GradleDependency
 yutori = "6df4cf804e06662977abc587b4114c13c1064459"
 yutorix-satori = "8f5b388f259878e7bf8374a8636ef92e9e3f40a9"
 multiplatform-settings = "1.2.0"
