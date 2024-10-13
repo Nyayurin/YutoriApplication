@@ -1,7 +1,0 @@
-CREATE TABLE GuildMember (
-    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    user_id TEXT,
-    nick TEXT,
-    avatar TEXT,
-    joined_at INTEGER
-);

@@ -66,7 +66,7 @@ import cn.yurn.yutori.message.element.Underline
 import cn.yurn.yutori.message.element.Video
 
 fun AppViewModel.self(): Login? = logins.find {
-    it.platform == identify?.platform && it.self_id == identify?.selfId
+    it.platform == identify?.platform && it.user?.id == identify?.selfId
 }
 
 fun AppViewModel.userChannels(): MutableMap<String, Channel> = userChannels.getOrPut(

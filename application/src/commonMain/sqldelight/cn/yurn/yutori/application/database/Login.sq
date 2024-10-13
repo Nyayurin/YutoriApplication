@@ -1,9 +1,0 @@
-CREATE TABLE Login (
-    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    user_id TEXT,
-    self_id TEXT,
-    platform TEXT,
-    status INTEGER NOT NULL,
-    features TEXT DEFAULT '[]',
-    proxy_urls TEXT DEFAULT '[]'
-);

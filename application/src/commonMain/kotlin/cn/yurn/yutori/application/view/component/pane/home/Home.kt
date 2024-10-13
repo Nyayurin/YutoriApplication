@@ -192,7 +192,7 @@ fun HomePane(
                 topBar = {
                     TopBar(
                         login = logins.find {
-                            it.platform == identify?.platform && it.self_id == identify?.selfId
+                            it.platform == identify?.platform && it.user!!.id == identify?.selfId
                         },
                         onOpenDrawer = {
                             scope.launch {
@@ -257,13 +257,13 @@ private fun Drawer(
                 for (login in logins) {
                     val self = login.user
                     val status = when (logins.find {
-                        it.platform == identify?.platform && it.self_id == identify?.selfId
+                        it.platform == identify?.platform && it.user!!.id == identify?.selfId
                     }?.status) {
-                        Login.Status.OFFLINE -> "Offline"
-                        Login.Status.ONLINE -> "Online"
-                        Login.Status.CONNECT -> "Connect"
-                        Login.Status.RECONNECT -> "Reconnect"
-                        Login.Status.DISCONNECT -> "Disconnect"
+                        Login.LoginStatus.OFFLINE -> "Offline"
+                        Login.LoginStatus.ONLINE -> "Online"
+                        Login.LoginStatus.CONNECT -> "Connect"
+                        Login.LoginStatus.RECONNECT -> "Reconnect"
+                        Login.LoginStatus.DISCONNECT -> "Disconnect"
                         else -> "Unknown"
                     }
                     NavigationDrawerItem(
@@ -301,9 +301,9 @@ private fun Drawer(
                                 overflow = TextOverflow.Ellipsis
                             )
                         },
-                        selected = identify?.platform == login.platform && identify?.selfId == login.self_id,
+                        selected = identify?.platform == login.platform && identify?.selfId == login.user!!.id,
                         onClick = {
-                            onSwitchUser(Identify(login.platform!!, login.self_id!!))
+                            onSwitchUser(Identify(login.platform!!, login.user!!.id))
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -381,11 +381,11 @@ private fun TopBar(
                         overflow = TextOverflow.Ellipsis
                     )
                     val status = when (login?.status) {
-                        Login.Status.OFFLINE -> "Offline"
-                        Login.Status.ONLINE -> "Online"
-                        Login.Status.CONNECT -> "Connect"
-                        Login.Status.RECONNECT -> "Reconnect"
-                        Login.Status.DISCONNECT -> "Disconnect"
+                        Login.LoginStatus.OFFLINE -> "Offline"
+                        Login.LoginStatus.ONLINE -> "Online"
+                        Login.LoginStatus.CONNECT -> "Connect"
+                        Login.LoginStatus.RECONNECT -> "Reconnect"
+                        Login.LoginStatus.DISCONNECT -> "Disconnect"
                         else -> "Unknown"
                     }
                     Text(

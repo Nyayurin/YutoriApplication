@@ -4,7 +4,7 @@ package cn.yurn.yutori.application
 
 import androidx.compose.runtime.mutableStateListOf
 import cn.yurn.yutori.Adapter
-import cn.yurn.yutori.Context
+import cn.yurn.yutori.AdapterContext
 import cn.yurn.yutori.Event
 import cn.yurn.yutori.Login
 import cn.yurn.yutori.MessageEvent
@@ -18,8 +18,8 @@ import cn.yurn.yutori.application.viewmodel.AppViewModel
 import cn.yurn.yutori.channel
 import cn.yurn.yutori.guild
 import cn.yurn.yutori.message
-import cn.yurn.yutori.module.satori.adapter.Satori
 import cn.yurn.yutori.module.satori.adapter.SatoriActionService
+import cn.yurn.yutori.module.satori.adapter.satori
 import cn.yurn.yutori.nick
 import cn.yurn.yutori.user
 import cn.yurn.yutori.yutori
@@ -28,7 +28,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 fun makeYutori(viewModel: AppViewModel): Yutori = yutori {
-    install(Adapter.Satori) {
+    install(Adapter.satori()) {
         this.host = Setting.connectSetting!!.host
         this.port = Setting.connectSetting!!.port
         this.path = Setting.connectSetting!!.path
@@ -58,15 +58,16 @@ suspend fun onConnect(
 ) {
     coroutineScope {
         for (login in logins) {
-            viewModel.logins.removeIf { it.platform == login.platform && it.self_id == login.self_id }
+            viewModel.logins.removeIf { it.platform == login.platform && it.user!!.id == login.user!!.id }
             viewModel.logins += login
             val platform = login.platform!!
-            val selfId = login.self_id!!
+            val selfId = login.user!!.id
             val identify = Identify(platform, selfId)
             viewModel.identify = identify
             val actions = RootActions(
+                alias = null,
                 platform = platform,
-                self_id = selfId,
+                userId = selfId,
                 service = service,
                 yutori = yutori
             )
@@ -93,7 +94,7 @@ suspend fun onConnect(
                                 var channelNext: String? = null
                                 do {
                                     val channelList = actions.channel.list(
-                                        guild_id = guild.id,
+                                        guildId = guild.id,
                                         next = channelNext
                                     )
                                     for (channel in channelList.data) {
@@ -124,14 +125,14 @@ suspend fun onConnect(
                             }
                             if (user.id == viewModel.identify!!.selfId) {
                                 viewModel.logins.find {
-                                    it.platform == identify.platform && it.self_id == identify.selfId
+                                    it.platform == identify.platform && it.user!!.id == identify.selfId
                                 }?.let { find ->
                                     viewModel.logins[viewModel.logins.indexOf(find)] = find.copy(user = user)
                                 }
                             }
                             launch {
                                 channels[user.id] = actions.user.channel.create(
-                                    user_id = user.id
+                                    userId = user.id
                                 )
                             }
                         }
@@ -147,10 +148,10 @@ suspend fun onConnect(
     }
 }
 
-fun Context<SigningEvent>.onAnyEvent(viewModel: AppViewModel) {
+fun AdapterContext<SigningEvent>.onAnyEvent(viewModel: AppViewModel) {
     val identify = Identify(
         platform = event.platform,
-        selfId = event.self_id
+        selfId = event.selfId
     )
     val events = viewModel.events.getOrPut(
         key = identify,
@@ -159,7 +160,7 @@ fun Context<SigningEvent>.onAnyEvent(viewModel: AppViewModel) {
     if (events.find { it.id == event.id } != null) return
     events += event
     when (event.type) {
-        MessageEvents.Created -> {
+        MessageEvents.CREATED -> {
             val event = event as Event<MessageEvent>
             val conversations = viewModel.conversations.getOrPut(
                 key = identify,
@@ -215,7 +216,7 @@ fun Context<SigningEvent>.onAnyEvent(viewModel: AppViewModel) {
                 else -> error("Unsupported type: $type")
             }
             val content = buildString {
-                if (event.user.id == event.self_id) {
+                if (event.user.id == event.selfId) {
                     append("me")
                 } else {
                     append(event.nick())
@@ -223,7 +224,7 @@ fun Context<SigningEvent>.onAnyEvent(viewModel: AppViewModel) {
                 append(": ")
                 append(previewMessageContent(event.message.content))
             }
-            val unread = event.user.id != event.self_id && when (type) {
+            val unread = event.user.id != event.selfId && when (type) {
                 "guild" -> event.guild!!.id != viewModel.conversation?.guild?.id
                 "user" -> event.channel.id != viewModel.conversation?.channel?.id
                 else -> error("Unsupported type: $type")

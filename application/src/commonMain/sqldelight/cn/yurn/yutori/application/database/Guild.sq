@@ -1,5 +1,0 @@
-CREATE TABLE Guild (
-    id TEXT PRIMARY KEY NOT NULL,
-    name TEXT,
-    avatar TEXT
-);

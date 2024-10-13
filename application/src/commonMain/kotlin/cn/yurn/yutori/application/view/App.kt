@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 fun App(viewModel: AppViewModel = viewModel()) {
     remember(Unit) {
         if (Setting.connectSetting != null) {
-            viewModel.logins.replaceAll { it.copy(status = Login.Status.CONNECT) }
+            viewModel.logins.replaceAll { it.copy(status = Login.LoginStatus.CONNECT) }
             viewModel.yutori?.stop()
             viewModel.yutori = makeYutori(viewModel)
             viewModel.viewModelScope.launch {
@@ -107,7 +107,7 @@ fun App(viewModel: AppViewModel = viewModel()) {
                     onMessageCreated = { channel, content ->
                         scope.launch {
                             viewModel.actions()!!.message.create(
-                                channel_id = channel.id,
+                                channelId = channel.id,
                                 content = {
                                     text { content }
                                 }
@@ -131,7 +131,7 @@ fun App(viewModel: AppViewModel = viewModel()) {
                             path = path,
                             token = token
                         )
-                        viewModel.logins.replaceAll { it.copy(status = Login.Status.CONNECT) }
+                        viewModel.logins.replaceAll { it.copy(status = Login.LoginStatus.CONNECT) }
                         viewModel.yutori?.stop()
                         viewModel.yutori = makeYutori(viewModel)
                         viewModel.viewModelScope.launch {

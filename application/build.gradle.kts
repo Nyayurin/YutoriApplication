@@ -48,14 +48,12 @@ kotlin {
             implementation(libs.yutorix.satori.adapter)
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.serialization)
-            implementation(libs.sqldelight.coroutines)
             implementation(libs.compose.settings)
             implementation(libs.compose.settings.extended)
             implementation(libs.sketch.compose)
             implementation(libs.sketch.extensions.compose)
             implementation(libs.sketch.svg)
             implementation(libs.sketch.animated)
-            implementation(libs.compose.dnd)
             implementation(libs.compose.placeholder)
             implementation(libs.compose.material3.adaptive)
             implementation(libs.compose.material3.adaptive.layout)
@@ -69,17 +67,14 @@ kotlin {
             implementation(libs.startup.runtime)
             implementation(libs.activity.compose)
             implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.sqldelight.android)
         }
 
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.sqldelight.jvm)
         }
 
         /*jsMain.dependencies {
-            implementation(libs.sqldelight.js)
             implementation(devNpm("copy-webpack-plugin", "9.1.0"))
         }
 

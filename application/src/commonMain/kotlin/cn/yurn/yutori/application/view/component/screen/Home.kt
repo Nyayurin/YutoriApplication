@@ -99,7 +99,7 @@ fun HomeScreen(
                 val destination = navigator.currentDestination?.content
                 if (destination != null) {
                     val login = logins.find {
-                        it.platform == identify?.platform && it.self_id == identify?.selfId
+                        it.platform == identify?.platform && it.user!!.id == identify?.selfId
                     }
                     when {
                         destination is Conversation && destination.type == "guild" || destination is Guild -> {

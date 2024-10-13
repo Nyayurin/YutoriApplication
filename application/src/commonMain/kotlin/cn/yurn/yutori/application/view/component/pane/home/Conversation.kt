@@ -168,7 +168,7 @@ fun ConversationGuildPane(
                 .padding(paddingValues)
         ) {
             val messages = events.filter {
-                it.type == MessageEvents.Created && it.channel!!.id == selectedChannel.id
+                it.type == MessageEvents.CREATED && it.channel!!.id == selectedChannel.id
             }.map { it as Event<MessageEvent> }.toMutableStateList()
             items(
                 items = messages.sortedWith { o1, o2 ->
@@ -176,7 +176,7 @@ fun ConversationGuildPane(
                 }.reversed(),
                 key = { message -> message.id }
             ) { event ->
-                if (event.user.id == login!!.self_id) {
+                if (event.user.id == login!!.user!!.id) {
                     RightBubble(event)
                 } else {
                     LeftBubble(event)
@@ -224,7 +224,7 @@ fun ConversationUserPane(
                 .padding(paddingValues)
         ) {
             val messages = events.filter {
-                it.type == MessageEvents.Created && it.channel!!.id == channel.id
+                it.type == MessageEvents.CREATED && it.channel!!.id == channel.id
             }.map { it as Event<MessageEvent> }.toMutableStateList()
             items(
                 items = messages.sortedWith { o1, o2 ->
@@ -232,7 +232,7 @@ fun ConversationUserPane(
                 }.reversed(),
                 key = { message -> message.id }
             ) { event ->
-                if (event.user.id == login?.self_id) {
+                if (event.user.id == login?.user!!.id) {
                     RightBubble(event)
                 } else {
                     LeftBubble(event)
@@ -445,12 +445,15 @@ private fun LeftBubble(
                 ),
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainerHigh)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                    modifier = Modifier
-                        .padding(16.dp)
-                ) {
-                    SelectionContainer {
+                SelectionContainer {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            Alignment.CenterVertically
+                        ),
+                        modifier = Modifier
+                            .padding(16.dp)
+                    ) {
                         for (column in makeMessage(event)) {
                             if (column.size <= 1) {
                                 if (column.isEmpty()) {
@@ -502,12 +505,15 @@ private fun RightBubble(
                 ),
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                    modifier = Modifier
-                        .padding(16.dp)
-                ) {
-                    SelectionContainer {
+                SelectionContainer {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            Alignment.CenterVertically
+                        ),
+                        modifier = Modifier
+                            .padding(16.dp)
+                    ) {
                         for (column in makeMessage(event)) {
                             if (column.size <= 1) {
                                 if (column.isEmpty()) {
